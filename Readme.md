@@ -1,7 +1,7 @@
 # Проект «Киноман»
 
 * Студент: [SIAMEN FILIPENKA](https://up.htmlacademy.ru/ecmascript/16/user/1809599).
-* Наставник: `Неизвестно`.
+* Наставник: Виктор Кан.
 
 ---
 
