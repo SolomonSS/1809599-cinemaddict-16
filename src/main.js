@@ -6,6 +6,7 @@ import {createShowMoreButtonTemplate} from './view/show-more-button-view.js';
 import {renderTemplate, RenderPosition} from './render.js';
 import {createSortList} from './view/sort.js';
 import {createMainSheme} from './view/main-sheme.js';
+import {films} from './mocks/film.js';
 
 const FILM_COUNT = 5;
 
@@ -19,10 +20,9 @@ renderTemplate(pageMain, createMainSheme(), RenderPosition.BEFOREEND);
 
 const filmsList = document.querySelector('.films-list__container');
 for(let i =0; i<FILM_COUNT; i++){
-  renderTemplate(filmsList, createFilmCardTemplate(), RenderPosition.BEFOREEND);
+  renderTemplate(filmsList, createFilmCardTemplate(films[i]), RenderPosition.BEFOREEND);
 }
 renderTemplate(pageMain, createShowMoreButtonTemplate(), RenderPosition.BEFOREEND);
 renderTemplate(pageMain, createTopRatedTemplate(), RenderPosition.BEFOREEND);
-//const filmsListExtra = pageMain.querySelector('section.films-list--extra');
-//renderTemplate(filmsListExtra, createTopRatedTemplate(), RenderPosition.AFTEREND);
+
 
