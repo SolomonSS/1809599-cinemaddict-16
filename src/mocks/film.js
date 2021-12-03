@@ -21,7 +21,7 @@ const AUTHOR_NAMES = ['Name1', 'Name2', 'Name3', 'Name4', 'Name15', 'Name16', 'N
 const POSTERS = ['made-for-each-other.png', 'popeye-meets-sinbad.png', 'sagebrush-trail.jpg', 'santa-claus-conquers-the-martians.jpg',
   'the-dance-of-life.jpg', 'the-great-flamarion.jpg', 'the-man-with-the-golden-arm.jpg'];
 
-const getImgAddress = (type, list) => `/images/${type}/${list[getRandomInteger(0, list.length - 1)]}`;
+const getImgAddress = (type, list) => `images/${type}/${list[getRandomInteger(0, list.length - 1)]}`;
 
 const getFullDescription = () => {
   const randomArrayDescription = getRandomArray(DESCRIPTIONS,5);

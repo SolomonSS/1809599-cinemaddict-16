@@ -1,3 +1,5 @@
+import {createElement} from '../render.js';
+
 const renderGenres = (genres) => {
   let genresList = '';
   for (const genre of genres) {
@@ -26,8 +28,8 @@ const renderComments = (comments) => {
   return commentsList;
 };
 
-export const popupTemplate = (popup) => `
-  <section class="film-details">
+const popupTemplate = (popup) =>
+  `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
     <div class="film-details__top-container">
       <div class="film-details__close">
@@ -135,5 +137,29 @@ export const popupTemplate = (popup) => `
       </section>
     </div>
   </form>
-</section>
-`;
+</section>`;
+
+export default class PopupView {
+  #element = null;
+  #film = null;
+
+  constructor(film) {
+    this.#film = film;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+    return this.#element;
+  }
+
+  get template() {
+    return popupTemplate(this.#film);
+  }
+
+  remove() {
+    this.#element = null;
+  }
+
+}
