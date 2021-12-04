@@ -30,29 +30,28 @@ const renderComments = (comments) => {
 
 const popupTemplate = (popup) =>
   `<section class="film-details">
-  <form class="film-details__inner" action="" method="get">
-    <div class="film-details__top-container">
-      <div class="film-details__close">
-        <button class="film-details__close-btn" type="button">close</button>
-      </div>
-      <div class="film-details__info-wrap">
-        <div class="film-details__poster">
-          <img class="film-details__poster-img" src="${popup.poster}" alt="">
-
-          <p class="film-details__age">${popup.censored}</p>
-        </div>
-
-        <div class="film-details__info">
-          <div class="film-details__info-head">
-            <div class="film-details__title-wrap">
-              <h3 class="film-details__title">${popup.filmName}</h3>
-              <p class="film-details__title-original">${popup.originalFilmName}</p>
+    <form class="film-details__inner" action="" method="get">
+        <div class="film-details__top-container">
+            <div class="film-details__close">
+                <button class="film-details__close-btn" type="button">close</button>
             </div>
+            <div class="film-details__info-wrap">
+                <div class="film-details__poster">
+                    <img class="film-details__poster-img" src="${popup.poster}" alt="">
+                    <p class="film-details__age">${popup.censored}</p>
+                </div>
 
-            <div class="film-details__rating">
-              <p class="film-details__total-rating">${popup.rating}</p>
-            </div>
-          </div>
+                <div class="film-details__info">
+                    <div class="film-details__info-head">
+                        <div class="film-details__title-wrap">
+                        <h3 class="film-details__title">${popup.filmName}</h3>
+                        <p class="film-details__title-original">${popup.originalFilmName}</p>
+                    </div>
+
+                    <div class="film-details__rating">
+                    <p class="film-details__total-rating">${popup.rating}</p>
+                    </div>
+                </div>
 
           <table class="film-details__table">
             <tr class="film-details__row">
@@ -80,7 +79,7 @@ const popupTemplate = (popup) =>
               <td class="film-details__cell">${popup.country}</td>
             </tr>
             <tr class="film-details__row">
-              <td class="film-details__term">${popup.genres.length < 1 ? 'Genre' : 'Genres'}</td>
+              <td class="film-details__term">${popup.genres.length === 1 ? 'Genre' : 'Genres'}</td>
               <td class="film-details__cell">
                 ${renderGenres(popup.genres)}
             </tr>
@@ -89,8 +88,8 @@ const popupTemplate = (popup) =>
           <p class="film-details__film-description">
             ${popup.description}
           </p>
+            </div>
         </div>
-      </div>
 
       <section class="film-details__controls">
         <button type="button" class="film-details__control-button film-details__control-button--watchlist ${popup.isAddedToWatchList && 'film-card__controls-item--active'}" id="watchlist" name="watchlist">Add to watchlist</button>
@@ -131,17 +130,17 @@ const popupTemplate = (popup) =>
             <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
             <label class="film-details__emoji-label" for="emoji-angry">
               <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
-            </label>
-          </div>
+                        </label>
+                    </div>
+                </div>
+            </section>
         </div>
-      </section>
-    </div>
-  </form>
-</section>`;
+    </form>
+  </section>`;
 
 export default class PopupView {
   #element = null;
-  #film = null;
+  #film;
 
   constructor(film) {
     this.#film = film;

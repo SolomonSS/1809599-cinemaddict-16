@@ -70,5 +70,5 @@ const generateFilmCard = () => {
 };
 
 
-export const films = Array.from({length:FILM_CARDS_COUNT}, generateFilmCard);
-export {getFullDescription, getComments, NAMES, AUTHOR_NAMES, GENRES};
+const films = Array.from({length:FILM_CARDS_COUNT}, generateFilmCard);
+export {getFullDescription, getComments, NAMES, AUTHOR_NAMES, GENRES, films};

@@ -19,26 +19,38 @@ render(pageMain, new SiteMenuView().element, RenderPosition.AFTERBEGIN);
 render(pageMain, new SortListView().element, RenderPosition.BEFOREEND);
 render(pageMain, new MainSheme().element, RenderPosition.BEFOREEND);
 
+const onOpenedPopup = (element) => {
+  element.addEventListener('click', () => {
+    element.remove();
+  });
+};
+
+let startIndex = 5;
+
+const onFilmCardClick = (card) => {
+  card.addEventListener('click', (evt) => {
+    if (!evt.target.closest('.film-card__controls')) {
+      render(pageMain, new PopupView(getPopup(card)).element, RenderPosition.BEFOREEND);
+      const closePopupButton = pageMain.querySelector('.film-details__close-btn');
+      onOpenedPopup(closePopupButton);
+    }
+  });
+};
+
 const filmsList = document.querySelector('.films-list__container');
 for (let i = 0; i < FILM_COUNT; i++) {
-  render(filmsList, new FilmCardView(films[i]).element, RenderPosition.BEFOREEND);
+  const card = new FilmCardView(films[i]);
+  render(filmsList, card.element, RenderPosition.BEFOREEND);
+  onFilmCardClick(card.template);
 }
 render(pageMain, new ShowMoreButtonView().element, RenderPosition.BEFOREEND);
 render(pageMain, new TopRatedTemplateView().element, RenderPosition.BEFOREEND);
-render(pageMain, new PopupView(getPopup(films[0])).element, RenderPosition.BEFOREEND);
 const showMoreButton = pageMain.querySelector('.films-list__show-more');
-const popup = document.querySelector('.film-details');
-const closePopupButton = popup.querySelector('.film-details__close-btn');
-
-closePopupButton.addEventListener('click', () =>{
-  popup.remove();
-});
-
-let startIndex = 5;
 
 const renderMoreCards = (cardsList) => {
   cardsList.forEach((card) => {
     render(filmsList, new FilmCardView(card).element, RenderPosition.BEFOREEND);
+    onFilmCardClick(card);
   });
 };
 
@@ -46,10 +58,11 @@ const onButtonClick = () => {
   const renderCards = films.slice(startIndex, startIndex + FILM_COUNT);
   startIndex += FILM_COUNT;
   renderMoreCards(renderCards);
-  if(startIndex>=films.length) {
+  if (startIndex >= films.length) {
     showMoreButton.remove();
   }
 };
 
 showMoreButton.addEventListener('click', onButtonClick);
+
 
