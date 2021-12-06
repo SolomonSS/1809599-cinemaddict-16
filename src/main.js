@@ -13,27 +13,28 @@ import {getPopup} from './mocks/popup';
 const FILM_COUNT = 5;
 const pageHeader = document.querySelector('.header');
 const pageMain = document.querySelector('.main');
-
+let startIndex = 5;
 render(pageHeader, new UserRankView().element, RenderPosition.BEFOREEND);
 render(pageMain, new SiteMenuView().element, RenderPosition.AFTERBEGIN);
 render(pageMain, new SortListView().element, RenderPosition.BEFOREEND);
 render(pageMain, new MainSheme().element, RenderPosition.BEFOREEND);
 
-const onOpenedPopup = (element) => {
-  element.addEventListener('click', () => {
-    element.remove();
+const renderPopup = (data)=>{
+  const card = getPopup(data);
+  const popup = new PopupView(card);
+  render(pageMain, popup.element, RenderPosition.BEFOREEND);
+  const closePopupButton = popup.element.querySelector('.film-details__close-btn');
+  closePopupButton.addEventListener('click', ()=>{
+    closePopupButton.removeEventListener('click', renderPopup);
+    popup.remove();
+    popup.element.remove();
   });
 };
 
-let startIndex = 5;
-
-const onFilmCardClick = (card) => {
-  card.addEventListener('click', (evt) => {
-    if (!evt.target.closest('.film-card__controls')) {
-      render(pageMain, new PopupView(getPopup(card)).element, RenderPosition.BEFOREEND);
-      const closePopupButton = pageMain.querySelector('.film-details__close-btn');
-      onOpenedPopup(closePopupButton);
-    }
+const onFilmCardClick = (data) =>{
+  const element = data.element;
+  element.addEventListener('click', ()=> {
+    renderPopup(data);
   });
 };
 
@@ -41,7 +42,7 @@ const filmsList = document.querySelector('.films-list__container');
 for (let i = 0; i < FILM_COUNT; i++) {
   const card = new FilmCardView(films[i]);
   render(filmsList, card.element, RenderPosition.BEFOREEND);
-  onFilmCardClick(card.template);
+  onFilmCardClick(card);
 }
 render(pageMain, new ShowMoreButtonView().element, RenderPosition.BEFOREEND);
 render(pageMain, new TopRatedTemplateView().element, RenderPosition.BEFOREEND);
@@ -49,8 +50,9 @@ const showMoreButton = pageMain.querySelector('.films-list__show-more');
 
 const renderMoreCards = (cardsList) => {
   cardsList.forEach((card) => {
-    render(filmsList, new FilmCardView(card).element, RenderPosition.BEFOREEND);
-    onFilmCardClick(card);
+    const filmCard = new FilmCardView(card).element;
+    render(filmsList, filmCard, RenderPosition.BEFOREEND);
+    onFilmCardClick(filmCard);
   });
 };
 
