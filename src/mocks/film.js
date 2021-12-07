@@ -20,6 +20,10 @@ const GENRES = ['genre1', 'genre2', 'genre3', 'genre4', 'genre5', 'genre6'];
 const AUTHOR_NAMES = ['Name1', 'Name2', 'Name3', 'Name4', 'Name15', 'Name16', 'Name7'];
 const POSTERS = ['made-for-each-other.png', 'popeye-meets-sinbad.png', 'sagebrush-trail.jpg', 'santa-claus-conquers-the-martians.jpg',
   'the-dance-of-life.jpg', 'the-great-flamarion.jpg', 'the-man-with-the-golden-arm.jpg'];
+const WRITERS = ['Джадд Апатоу', 'Стивен Чбоски', 'Джеймс Айвори', 'София Коппола', 'Пол Шредер'];
+const ACTORS = ['ЛИ ААКЕР','ФРЭНК ДЖ. ААРД', 'ААШ ААРОН', 'Австралийский актер', 'КУИНТОН ААРОН','НИКОЛАС ААРОН'];
+const COUNTRIES = ['Russia', 'Belarus', 'USA', 'France'];
+const DIRECTORS = ['ЛИ ААКЕР','ФРЭНК ДЖ. ААРД', 'ААШ ААРОН','Джадд Апатоу', 'Стивен Чбоски', 'Джеймс Айвори'];
 
 const getImgAddress = (type, list) => `images/${type}/${list[getRandomInteger(0, list.length - 1)]}`;
 
@@ -53,15 +57,22 @@ const getComments = () => {
 
 const generateFilmCard = () => {
   const descriptionValue = getFullDescription();
+  const name = NAMES[getRandomInteger(0, NAMES.length - 1)];
   return {
-    filmName: NAMES[getRandomInteger(0, NAMES.length - 1)],
+    filmName: name,
+    originalFilmName: name.toUpperCase(),
     poster: getImgAddress('posters', POSTERS),
     fullDescription: descriptionValue,
     description: getShortDescription(descriptionValue),
+    director: DIRECTORS[getRandomInteger(0, DIRECTORS.length-1)] ,
+    writers: getRandomArray(WRITERS, 3),
+    actors: ACTORS[getRandomInteger(0, ACTORS.length-1)],
     rating: getRandomInteger(0, 10),
     realise: getRandomInteger(1995, 2021),
     duration: `${getRandomInteger(1, 3)}h ${getRandomInteger(0, 60)}m`,
     genres: getRandomArray(GENRES, 3),
+    country: COUNTRIES[getRandomInteger(0, COUNTRIES.length-1)],
+    censored: `${getRandomInteger(0,18 )}+`,
     comments: getComments(),
     isAddedToWatchList: Boolean(getRandomInteger()),
     isWatched: Boolean(getRandomInteger()),
