@@ -22,11 +22,14 @@ render(pageMain, new SortListView().element, RenderPosition.BEFOREEND);
 render(pageMain, new MainSheme().element, RenderPosition.BEFOREEND);
 const filmsList = pageMain.querySelector('.films-list__container');
 
-const onEscKeyDown = (evt) => {
-  if (evt.key === 'Escape' || evt.key === 'Esc') {
-    evt.preventDefault();
-    document.removeEventListener('keydown', onEscKeyDown);
-  }
+const onEscKeyDownHandler = (popup) => {
+  document.addEventListener('keydown', (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      popup.element.remove();
+      popup.remove();
+      document.removeEventListener('keydown', onEscKeyDownHandler);
+    }
+  });
 };
 
 const addCardClicker = (cardData) => {
@@ -35,8 +38,8 @@ const addCardClicker = (cardData) => {
   card.setClickHandler(() => {
     const popup = new PopupView(cardData);
     render(pageFooter, popup.element, RenderPosition.BEFOREEND);
+    onEscKeyDownHandler(popup);
     const closePopupButton = popup.element.querySelector('.film-details__close-btn');
-    document.addEventListener('keydown', onEscKeyDown);
     closePopupButton.addEventListener('click', () => {
       popup.element.remove();
       popup.remove();
