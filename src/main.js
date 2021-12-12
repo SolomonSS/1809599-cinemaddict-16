@@ -43,7 +43,7 @@ const showMoreButton = new ShowMoreButtonView();
 render(pageMain, showMoreButton.element, RenderPosition.BEFOREEND);
 render(pageMain, new TopRatedTemplateView().element, RenderPosition.BEFOREEND);
 
-const renderMoreCards = () => {
+showMoreButton.setClickHandler(() => {
   const renderCards = films.slice(startIndex, startIndex + FILM_COUNT);
   startIndex += FILM_COUNT;
   renderCards.forEach((card) => {
@@ -55,8 +55,4 @@ const renderMoreCards = () => {
     showMoreButton.element.remove();
     showMoreButton.remove();
   }
-};
-
-showMoreButton.setClickHandler(() => {
-  renderMoreCards();
 });
