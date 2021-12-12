@@ -20,12 +20,23 @@ render(pageHeader, new UserRankView().element, RenderPosition.BEFOREEND);
 render(pageMain, new SiteMenuView().element, RenderPosition.AFTERBEGIN);
 render(pageMain, new SortListView().element, RenderPosition.BEFOREEND);
 render(pageMain, new MainSheme().element, RenderPosition.BEFOREEND);
+const filmsList = pageMain.querySelector('.films-list__container');
 
-const renderPopup = (element, data) => {
-  element.addEventListener('click', () => {
-    const popup = new PopupView(data);
+const onEscKeyDown = (evt) => {
+  if (evt.key === 'Escape' || evt.key === 'Esc') {
+    evt.preventDefault();
+    document.removeEventListener('keydown', onEscKeyDown);
+  }
+};
+
+const addCardClicker = (cardData) => {
+  const card = new FilmCardView(cardData);
+  render(filmsList, card.element, RenderPosition.BEFOREEND);
+  card.setClickHandler(() => {
+    const popup = new PopupView(cardData);
     render(pageFooter, popup.element, RenderPosition.BEFOREEND);
-    const closePopupButton = pageFooter.querySelector('.film-details__close-btn');
+    const closePopupButton = popup.element.querySelector('.film-details__close-btn');
+    document.addEventListener('keydown', onEscKeyDown);
     closePopupButton.addEventListener('click', () => {
       popup.element.remove();
       popup.remove();
@@ -33,11 +44,8 @@ const renderPopup = (element, data) => {
   });
 };
 
-const filmsList = document.querySelector('.films-list__container');
 for (let i = 0; i < FILM_COUNT; i++) {
-  const card = new FilmCardView(films[i]);
-  render(filmsList, card.element, RenderPosition.BEFOREEND);
-  renderPopup(card.element, films[i]);
+  addCardClicker(films[i]);
 }
 const showMoreButton = new ShowMoreButtonView();
 render(pageMain, showMoreButton.element, RenderPosition.BEFOREEND);
@@ -47,9 +55,7 @@ showMoreButton.setClickHandler(() => {
   const renderCards = films.slice(startIndex, startIndex + FILM_COUNT);
   startIndex += FILM_COUNT;
   renderCards.forEach((card) => {
-    const filmCard = new FilmCardView(card);
-    render(filmsList, filmCard.element, RenderPosition.BEFOREEND);
-    renderPopup(filmCard.element, card);
+    addCardClicker(card);
   });
   if (startIndex >= films.length) {
     showMoreButton.element.remove();
