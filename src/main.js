@@ -34,9 +34,9 @@ const onEscKeyDownHandler = (popup) => {
 
 const addCardClicker = (cardData) => {
   const card = new FilmCardView(cardData);
+  const popup = new PopupView(cardData);
   render(filmsList, card.element, RenderPosition.BEFOREEND);
   card.setClickHandler(() => {
-    const popup = new PopupView(cardData);
     render(pageFooter, popup.element, RenderPosition.BEFOREEND);
     onEscKeyDownHandler(popup);
     const closePopupButton = popup.element.querySelector('.film-details__close-btn');
@@ -55,11 +55,9 @@ render(pageMain, showMoreButton.element, RenderPosition.BEFOREEND);
 render(pageMain, new TopRatedTemplateView().element, RenderPosition.BEFOREEND);
 
 showMoreButton.setClickHandler(() => {
-  const renderCards = films.slice(startIndex, startIndex + FILM_COUNT);
+  const nextCards = films.slice(startIndex, startIndex + FILM_COUNT);
   startIndex += FILM_COUNT;
-  renderCards.forEach((card) => {
-    addCardClicker(card);
-  });
+  nextCards.forEach(addCardClicker);
   if (startIndex >= films.length) {
     showMoreButton.element.remove();
     showMoreButton.remove();
