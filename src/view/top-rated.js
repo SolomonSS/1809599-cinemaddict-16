@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from './abstract-view.js';
 
 const createTopRatedTemplate = () => (`
 <section class="films">
@@ -13,21 +13,8 @@ const createTopRatedTemplate = () => (`
  </section>
 `);
 
-export default class TopRatedTemplateView {
-  #element = null;
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
-
+export default class TopRatedTemplateView extends AbstractView{
   get template() {
     return createTopRatedTemplate();
-  }
-
-  remove() {
-    this.#element = null;
   }
 }

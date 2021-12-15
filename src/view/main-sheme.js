@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from './abstract-view.js';
 
 const createMainSheme = () => (
   `<section class="films">
@@ -9,22 +9,9 @@ const createMainSheme = () => (
  </section>`
 );
 
-export default class MainSheme{
-  #element = null;
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
-
+export default class MainSheme extends AbstractView{
   get template() {
     return createMainSheme();
-  }
-
-  remove() {
-    this.#element = null;
   }
 }
 

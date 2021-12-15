@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from './abstract-view.js';
 
 const renderGenres = (genres) => {
   let genresList = '';
@@ -68,7 +68,7 @@ const popupTemplate = (popup) =>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
-              <td class="film-details__cell">${popup.realiseDate}</td>
+              <td class="film-details__cell">${popup.realise}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
@@ -138,27 +138,15 @@ const popupTemplate = (popup) =>
     </form>
   </section>`;
 
-export default class PopupView {
-  #element = null;
+export default class PopupView extends AbstractView{
   #film;
 
   constructor(film) {
+    super();
     this.#film = film;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
   }
 
   get template() {
     return popupTemplate(this.#film);
   }
-
-  remove() {
-    this.#element = null;
-  }
-
 }

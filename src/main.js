@@ -20,58 +20,46 @@ render(pageHeader, new UserRankView().element, RenderPosition.BEFOREEND);
 render(pageMain, new SiteMenuView().element, RenderPosition.AFTERBEGIN);
 render(pageMain, new SortListView().element, RenderPosition.BEFOREEND);
 render(pageMain, new MainSheme().element, RenderPosition.BEFOREEND);
+const filmsList = pageMain.querySelector('.films-list__container');
 
-const onPopupOpened = (popup) => {
-  const openedPopup = pageFooter.querySelector('section.film-details');
-  if (openedPopup) {
-    const closePopupButton = openedPopup.querySelector('.film-details__close-btn');
-    closePopupButton.addEventListener('click', () => {
-      popup.remove();
+const onEscKeyDownHandler = (popup) => {
+  document.addEventListener('keydown', (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
       popup.element.remove();
-      closePopupButton.removeEventListener('click', onPopupOpened);
-    });
-  }
-};
-
-const renderPopup = (data) => {
-  const popup = new PopupView(data);
-  render(pageFooter, popup.element, RenderPosition.BEFOREEND);
-  onPopupOpened(popup);
-};
-
-const onFilmCardClick = (element, data) => {
-  element.addEventListener('click', () => {
-    renderPopup(data);
+      popup.remove();
+      document.removeEventListener('keydown', onEscKeyDownHandler);
+    }
   });
 };
 
-const filmsList = document.querySelector('.films-list__container');
-for (let i = 0; i < FILM_COUNT; i++) {
-  const card = new FilmCardView(films[i]);
+const addCardClicker = (cardData) => {
+  const card = new FilmCardView(cardData);
+  const popup = new PopupView(cardData);
   render(filmsList, card.element, RenderPosition.BEFOREEND);
-  onFilmCardClick(card.element,films[i]);
-}
-render(pageMain, new ShowMoreButtonView().element, RenderPosition.BEFOREEND);
-render(pageMain, new TopRatedTemplateView().element, RenderPosition.BEFOREEND);
-const showMoreButton = pageMain.querySelector('.films-list__show-more');
-
-const renderMoreCards = (cardsList) => {
-  cardsList.forEach((card) => {
-    const filmCard = new FilmCardView(card);
-    render(filmsList, filmCard.element, RenderPosition.BEFOREEND);
-    onFilmCardClick(filmCard.element, card);
+  card.setClickHandler(() => {
+    render(pageFooter, popup.element, RenderPosition.BEFOREEND);
+    onEscKeyDownHandler(popup);
+    const closePopupButton = popup.element.querySelector('.film-details__close-btn');
+    closePopupButton.addEventListener('click', () => {
+      popup.element.remove();
+      popup.remove();
+    });
   });
 };
 
-const onButtonClick = () => {
-  const renderCards = films.slice(startIndex, startIndex + FILM_COUNT);
+for (let i = 0; i < FILM_COUNT; i++) {
+  addCardClicker(films[i]);
+}
+const showMoreButton = new ShowMoreButtonView();
+render(pageMain, showMoreButton.element, RenderPosition.BEFOREEND);
+render(pageMain, new TopRatedTemplateView().element, RenderPosition.BEFOREEND);
+
+showMoreButton.setClickHandler(() => {
+  const nextCards = films.slice(startIndex, startIndex + FILM_COUNT);
   startIndex += FILM_COUNT;
-  renderMoreCards(renderCards);
+  nextCards.forEach(addCardClicker);
   if (startIndex >= films.length) {
+    showMoreButton.element.remove();
     showMoreButton.remove();
   }
-};
-
-showMoreButton.addEventListener('click', onButtonClick);
-
-
+});
