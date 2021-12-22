@@ -149,4 +149,14 @@ export default class PopupView extends AbstractView{
   get template() {
     return popupTemplate(this.#film);
   }
+
+  setEscHandler = (callback) => {
+    this._callback.escKeyDown = callback;
+    document.addEventListener('submit', this.#formSubmitHandler);
+  }
+
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.escKeyDown();
+  }
 }

@@ -1,40 +1,53 @@
 import FilmCardView from '../view/film-card-view.js';
 import {render, RenderPosition} from '../render.js';
-import {films} from '../mocks/film.js';
 import PopupView from '../view/popup.js';
-import {onEscKeyDownHandler} from '../mocks/utils.js';
 
-const filmsCountForClick = 5;
+const pageFooter = document.querySelector('.footer');
 
-export default class FilmPresenter{
-#movieCard = null;
+export default class FilmPresenter {
+  #film;
+  #filmCard;
+  #popup;
+  #filmsContainer;
 
-#filmCard = new FilmCardView(this.#movieCard);
-#popup = new PopupView(this.#movieCard);
+  constructor(container) {
+    this.#filmsContainer = container;
+  }
 
-constructor(movieData) {
-  this.#movieCard = movieData;
-}
+  init = (film) => {
+    this.#film = film;
+    this.#filmCard = new FilmCardView(this.#film);
+    this.#popup = new PopupView(this.#film);
+    render(this.#filmsContainer, this.#filmCard.element, RenderPosition.BEFOREEND);
+    this.#filmCard.setClickHandler(this.#addPopup);
+    this.#popup.setEscHandler(this.#escKeyDownHandler);
+  };
 
-renderCard(container){
-  render(container, this.#filmCard.element, RenderPosition.BEFOREEND);
-  this.addListener(container);
-}
+  #renderPopup = () => {
+    render(pageFooter, this.#popup.element, RenderPosition.BEFOREEND);
 
-addListener(container){
-  this.#filmCard.setClickHandler(() =>{
-    render(container, this.#popup.element, RenderPosition.BEFOREEND);
-    onEscKeyDownHandler(this.#popup);
-    this.closeButton().addEventListener(this.popupRemove);
-  });
-}
+  };
 
-closeButton(){
-  return this.#popup.element.querySelector('.film-details__close-btn');
-}
+  removePopupElement = () => {
+    this.#popup.element.remove();
+    this.#popup.remove();
+  };
 
-popupRemove(){
-  this.#popup.element.remove();
-  this.#popup.remove();
-}
+  #addPopup = () => {
+    this.#renderPopup();
+    this.#popup.element.querySelector('.film-details__close-btn').addEventListener('click', this.#removePopup);
+    document.addEventListener('keydown', this.#escKeyDownHandler);
+  };
+
+  #removePopup = () => {
+    this.removePopupElement();
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+  };
+
+  #escKeyDownHandler = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this.#removePopup();
+    }
+  };
 }
