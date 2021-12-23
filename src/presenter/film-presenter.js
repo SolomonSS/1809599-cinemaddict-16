@@ -34,6 +34,7 @@ export default class FilmPresenter {
   };
 
   #addPopup = () => {
+    this.#removePopup();
     this.#renderPopup();
     this.#popup.element.querySelector('.film-details__close-btn').addEventListener('click', this.#removePopup);
     document.addEventListener('keydown', this.#escKeyDownHandler);

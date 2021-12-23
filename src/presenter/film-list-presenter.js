@@ -1,6 +1,5 @@
 import TopRatedTemplateView from '../view/top-rated.js';
 import SiteMenuView from '../view/menu-view.js';
-import UserRankView from '../view/user-rank-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
 import SortListView from '../view/sort.js';
 import MainSheme from '../view/main-sheme.js';
@@ -14,28 +13,24 @@ const FILM_COUNT_PER_CLICK = 5;
 export default class FilmListPresenter {
   #topRated = new TopRatedTemplateView();
   #siteMenu = new SiteMenuView();
-  #userRank = new UserRankView();
   #showMoreButton = new ShowMoreButtonView();
   #sortList = new SortListView();
   #mainSheme = new MainSheme();
   #mainContainer;
-  #pageHeader;
-  #filmsContainer;
+  _filmsList;
 
-  constructor(header, main, filmContainer) {
+  constructor(main) {
     this.#mainContainer = main;
-    this.#pageHeader = header;
-    this.#filmsContainer = filmContainer;
   }
 
   init = () =>{
     this.#renderPageElements();
+    this._filmsList = document.querySelector('.films-list__container');
     this.#renderFilmCards();
     this.#showMoreButton.setClickHandler(this.#renderFilmCards);
   }
 
   #renderPageElements = () =>{
-    render(this.#pageHeader, this.#userRank.element, RenderPosition.BEFOREEND);
     render(this.#mainContainer, this.#siteMenu.element, RenderPosition.AFTERBEGIN);
     render(this.#mainContainer, this.#sortList.element, RenderPosition.BEFOREEND);
     render(this.#mainContainer, this.#mainSheme.element, RenderPosition.BEFOREEND);
@@ -53,7 +48,7 @@ export default class FilmListPresenter {
   }
 
   #renderFilmCard = (card) =>{
-    const film = new FilmPresenter(this.#filmsContainer);
+    const film = new FilmPresenter(this._filmsList);
     film.init(card);
   }
 
