@@ -170,7 +170,7 @@ export default class PopupView extends SmartView{
     const emojis = this.element.querySelectorAll('.film-details__emoji-item');
     for(const emoji of emojis){
       emoji.addEventListener('click', ()=>{
-        this.#emojisClickHandler(emoji);
+        this.#emojisClickHandler(emoji);//Не отрисовывается, ошибок в консоли нет, элементы все находит. Как дебажить далее я не понимаю.
       });
     }
   };
