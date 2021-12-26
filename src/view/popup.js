@@ -1,4 +1,4 @@
-import AbstractView from './abstract-view.js';
+import SmartView from './smart-view.js';
 
 const renderGenres = (genres) => {
   let genresList = '';
@@ -105,7 +105,7 @@ const popupTemplate = (popup) =>
         <ul class="film-details__comments-list"></ul>
             ${renderComments(popup.comments)}
         <div class="film-details__new-comment">
-          <div class="film-details__add-emoji-label"></div>
+          <div class="film-details__add-emoji-label"><img class="comment-emoji" src="" alt=""></div>
 
           <label class="film-details__comment-label">
             <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
@@ -138,12 +138,13 @@ const popupTemplate = (popup) =>
     </form>
   </section>`;
 
-export default class PopupView extends AbstractView{
+export default class PopupView extends SmartView{
   #film;
 
   constructor(film) {
     super();
     this.#film = film;
+    this.#renderEmoji();
   }
 
   get template() {
@@ -152,11 +153,25 @@ export default class PopupView extends AbstractView{
 
   setEscHandler = (callback) => {
     this._callback.escKeyDown = callback;
-    document.addEventListener('submit', this.#formSubmitHandler);
+    document.addEventListener('keydown', this.#formKeydownHandler);
   }
 
-  #formSubmitHandler = (evt) => {
+  #formKeydownHandler = (evt) => {
     evt.preventDefault();
     this._callback.escKeyDown();
   }
+
+  #emojisClickHandler = (emoji) =>{
+    const emojiImage = this.element.querySelector('.comment-emoji');
+    emojiImage.src = `../public/images/emoji/${emoji.value}.png`;
+  }
+
+  #renderEmoji = () =>{
+    const emojis = this.element.querySelectorAll('.film-details__emoji-item');
+    for(const emoji of emojis){
+      emoji.addEventListener('click', ()=>{
+        this.#emojisClickHandler(emoji);
+      });
+    }
+  };
 }
