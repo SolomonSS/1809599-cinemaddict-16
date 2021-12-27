@@ -105,7 +105,7 @@ const popupTemplate = (popup) =>
         <ul class="film-details__comments-list"></ul>
             ${renderComments(popup.comments)}
         <div class="film-details__new-comment">
-          <div class="film-details__add-emoji-label"><img class="comment-emoji" src="" alt=""></div>
+          <div class="film-details__add-emoji-label"><span class="film-details__comment-emoji"><img class="comment-emoji" src="" width="55" height="55" alt=""></span></div>
 
           <label class="film-details__comment-label">
             <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
@@ -144,34 +144,49 @@ export default class PopupView extends SmartView{
   constructor(film) {
     super();
     this.#film = film;
-    this.#renderEmoji();
   }
 
   get template() {
     return popupTemplate(this.#film);
   }
 
-  setEscHandler = (callback) => {
-    this._callback.escKeyDown = callback;
-    document.addEventListener('keydown', this.#formKeydownHandler);
+  restoreHandlers = () =>{
+
   }
 
-  #formKeydownHandler = (evt) => {
+  setEscHandler = (callback) => {
+    this._callback.escKeyDown = callback;
+    document.addEventListener('keydown', this.#escapeKeydownHandler);
+  }
+
+  setCloseButtonHandler = (callback) => {
+    this._callback.closeButton = callback;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler);
+  }
+
+  #clickHandler = () =>{
+    this._callback.closeButton();
+  }
+
+  #escapeKeydownHandler = (evt) => {
     evt.preventDefault();
     this._callback.escKeyDown();
   }
 
-  #emojisClickHandler = (emoji) =>{
-    const emojiImage = this.element.querySelector('.comment-emoji');
-    emojiImage.src = `../public/images/emoji/${emoji.value}.png`;
+  setEmojiClickHandler = (callback) =>{
+    this._callback.emojiClick = callback;
+    this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#emojiHandler);
   }
 
-  #renderEmoji = () =>{
-    const emojis = this.element.querySelectorAll('.film-details__emoji-item');
-    for(const emoji of emojis){
-      emoji.addEventListener('click', ()=>{
-        this.#emojisClickHandler(emoji);//Не отрисовывается, ошибок в консоли нет, элементы все находит. Как дебажить далее я не понимаю.
-      });
-    }
-  };
+  #emojiHandler = (evt) =>{
+    this.renderEmoji(evt);
+    this._callback.emojiClick();
+  }
+
+  renderEmoji = (evt) =>{
+    const emojiSrc = evt.target.src;
+    this.updateData({rating:evt.target.value});
+    this.element.querySelector('.comment-emoji').src = emojiSrc;
+  }
 }
+
