@@ -105,7 +105,9 @@ const popupTemplate = (popup) =>
         <ul class="film-details__comments-list"></ul>
             ${renderComments(popup.comments)}
         <div class="film-details__new-comment">
-          <div class="film-details__add-emoji-label"><span class="film-details__comment-emoji"><img class="comment-emoji" src="" width="55" height="55" alt=""></span></div>
+          <div class="film-details__add-emoji-label">
+          <span class="film-details__comment-emoji"><img class="comment-emoji" src="${popup.commentEmoji}" width="55" height="55" alt=""></span>
+          </div>
 
           <label class="film-details__comment-label">
             <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
@@ -138,55 +140,77 @@ const popupTemplate = (popup) =>
     </form>
   </section>`;
 
-export default class PopupView extends SmartView{
-  #film;
+export default class PopupView extends SmartView {
 
   constructor(film) {
     super();
-    this.#film = film;
+    this._data = PopupView.parseMovieToData(film);
+    this.restoreHandlers();
   }
 
   get template() {
-    return popupTemplate(this.#film);
+    return popupTemplate(this._data);
   }
 
-  restoreHandlers = () =>{
+  restoreHandlers = (cb) => {
+    this.#setInnerHandlers(cb);
+    this.setEmojiClickHandler();
+  }
 
+  #setInnerHandlers = (cb) => {
+    this.setCloseButtonHandler(cb);
+    this.setEscHandler(cb);
   }
 
   setEscHandler = (callback) => {
     this._callback.escKeyDown = callback;
     document.addEventListener('keydown', this.#escapeKeydownHandler);
-  }
+  };
 
   setCloseButtonHandler = (callback) => {
     this._callback.closeButton = callback;
     this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler);
-  }
+  };
 
-  #clickHandler = () =>{
+  #clickHandler = (evt) => {
+    evt.preventDefault();
     this._callback.closeButton();
-  }
+  };
 
   #escapeKeydownHandler = (evt) => {
     evt.preventDefault();
     this._callback.escKeyDown();
+  };
+
+  setEmojiClickHandler = (callback) => {
+    this._callback.emojiClick = callback;//Не могу понять, какой колбек сюда передать и где, т.к. после updateData необходимо ещё вызвать this.restoreHandlers,
+    this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#emojiHandler);//а в него при вызове тоже необходим коллбек, можно добавить второй коллбек на вход в restore,
+  };//но мне кажется что я чего-то не догоняю, и что всё можно сделать намного проще.
+
+  #emojiHandler = (evt) => {
+    this.updateData({commentEmoji: evt.target.value});
+    this._callback.emojiClick(PopupView.parseDataToMovie(this._data));
   }
 
-  setEmojiClickHandler = (callback) =>{
-    this._callback.emojiClick = callback;
-    this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#emojiHandler);
-  }
+  static parseMovieToData = (film) => ({
+    ...film,
+    isWatched: film.isWatched,
+    isFavorite: film.isFavorite,
+    isAddedToWatchList: film.isAddedToWatchList,
+  });
 
-  #emojiHandler = (evt) =>{
-    this.renderEmoji(evt);
-    this._callback.emojiClick();
-  }
-
-  renderEmoji = (evt) =>{
-    const emojiSrc = evt.target.src;
-    this.updateData({rating:evt.target.value});
-    this.element.querySelector('.comment-emoji').src = emojiSrc;
-  }
+  static parseDataToMovie = (data) => {
+    const film = {...data};
+    if (!film.isFavorite) {
+      film.isFavorite = false;
+    }
+    if (!film.isWatched){
+      film.isWatched = false;
+    }
+    if (!film.isAddedToWatchList){
+      film.isAddedToWatchList = false;
+    }
+    return film;
+  };
 }
 

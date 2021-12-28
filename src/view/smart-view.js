@@ -1,6 +1,7 @@
 import AbstractView from './abstract-view.js';
 
 export default class SmartView extends AbstractView{
+  _data = {};
   constructor() {
     super();
   }
@@ -9,19 +10,20 @@ export default class SmartView extends AbstractView{
     const prevElement = this.element;
     const parent = prevElement.parentElement;
     this.remove();
-
     const newElement = this.element;
-
     parent.replaceChild(newElement, prevElement);
+    this.restoreHandlers();
   }
 
   updateData = (update) => {
     if (!update) {
       return;
     }
-
     this._data = {...this._data, ...update};
-
     this.updateElement();
+  }
+
+  restoreHandlers = () => {
+    throw new Error('Abstract method not implemented: restoreHandlers');
   }
 }
