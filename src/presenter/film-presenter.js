@@ -34,7 +34,6 @@ export default class FilmPresenter {
 
   #addPopup = () => {
     this.#renderPopup();
-    this.#popup.restoreHandlers();
   };
 
   #removePopup = () => {
