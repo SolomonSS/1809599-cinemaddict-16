@@ -20,16 +20,21 @@ export default class FilmPresenter {
     this.#popup = new PopupView(this.#film);
     this.#filmCard.setClickHandler(this.#addPopup);
     render(this.#filmsContainer, this.#filmCard.element, RenderPosition.BEFOREEND);
-    this.#popup.restoreHandlers(this.#removePopup);
   };
 
   #renderPopup = () => {
     render(pageFooter, this.#popup.element, RenderPosition.BEFOREEND);
-    this.#popup.restoreHandlers(this.#removePopup);
+    this.#popup.setCloseButtonHandler(this.#removePopup);
+    document.addEventListener('keydown', (evt)=>{
+      if(evt.key ==='Escape' || evt.key === 'Esc'){
+        this.#removePopup();
+      }
+    });
   };
 
   #addPopup = () => {
     this.#renderPopup();
+    this.#popup.restoreHandlers();
   };
 
   #removePopup = () => {

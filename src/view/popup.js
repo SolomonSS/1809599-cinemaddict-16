@@ -144,28 +144,22 @@ export default class PopupView extends SmartView {
 
   constructor(film) {
     super();
-    this._data = PopupView.parseMovieToData(film);
-    this.restoreHandlers();
+    this._data = film;
+    this.#setInnerHandlers();
   }
 
   get template() {
     return popupTemplate(this._data);
   }
 
-  restoreHandlers = (cb) => {
-    this.#setInnerHandlers(cb);
-    this.setEmojiClickHandler();
+  restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setCloseButtonHandler(this._callback.closeButton);
   }
 
-  #setInnerHandlers = (cb) => {
-    this.setCloseButtonHandler(cb);
-    this.setEscHandler(cb);
+  #setInnerHandlers = () => {
+    this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#emojiHandler);
   }
-
-  setEscHandler = (callback) => {
-    this._callback.escKeyDown = callback;
-    document.addEventListener('keydown', this.#escapeKeydownHandler);
-  };
 
   setCloseButtonHandler = (callback) => {
     this._callback.closeButton = callback;
@@ -177,40 +171,9 @@ export default class PopupView extends SmartView {
     this._callback.closeButton();
   };
 
-  #escapeKeydownHandler = (evt) => {
-    evt.preventDefault();
-    this._callback.escKeyDown();
-  };
-
-  setEmojiClickHandler = (callback) => {
-    this._callback.emojiClick = callback;//Не могу понять, какой колбек сюда передать и где, т.к. после updateData необходимо ещё вызвать this.restoreHandlers,
-    this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#emojiHandler);//а в него при вызове тоже необходим коллбек, можно добавить второй коллбек на вход в restore,
-  };//но мне кажется что я чего-то не догоняю, и что всё можно сделать намного проще.
-
   #emojiHandler = (evt) => {
-    this.updateData({commentEmoji: evt.target.value});
-    this._callback.emojiClick(PopupView.parseDataToMovie(this._data));
+    this.element.querySelector('.comment-emoji').src = evt.target.src;
+    this.updateData({commentEmoji: evt.target.src});
   }
-
-  static parseMovieToData = (film) => ({
-    ...film,
-    isWatched: film.isWatched,
-    isFavorite: film.isFavorite,
-    isAddedToWatchList: film.isAddedToWatchList,
-  });
-
-  static parseDataToMovie = (data) => {
-    const film = {...data};
-    if (!film.isFavorite) {
-      film.isFavorite = false;
-    }
-    if (!film.isWatched){
-      film.isWatched = false;
-    }
-    if (!film.isAddedToWatchList){
-      film.isAddedToWatchList = false;
-    }
-    return film;
-  };
 }
 
