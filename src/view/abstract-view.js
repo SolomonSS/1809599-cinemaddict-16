@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import {createElement} from '../utils/render.js';
 
 export default class AbstractView {
   #element = null;
@@ -21,7 +21,7 @@ export default class AbstractView {
     throw new Error('Abstract method not implement');
   }
 
-  remove() {
+  removeElement() {
     this.#element = null;
   }
 }

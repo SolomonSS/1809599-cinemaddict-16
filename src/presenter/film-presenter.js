@@ -1,5 +1,5 @@
 import FilmCardView from '../view/film-card-view.js';
-import {render, RenderPosition} from '../render.js';
+import {remove, render, RenderPosition} from '../utils/render.js';
 import PopupView from '../view/popup.js';
 
 const pageFooter = document.querySelector('.footer');
@@ -25,16 +25,15 @@ export default class FilmPresenter {
 
   #renderPopup = () => {
     render(pageFooter, this.#popup.element, RenderPosition.BEFOREEND);
-
   };
 
   removePopupElement = () => {
     this.#popup.element.remove();
-    this.#popup.remove();
+    this.#popup.removeElement();
   };
 
   #addPopup = () => {
-    this.#removePopup();
+    remove(this.#popup);
     this.#renderPopup();
     this.#popup.element.querySelector('.film-details__close-btn').addEventListener('click', this.#removePopup);
     document.addEventListener('keydown', this.#escKeyDownHandler);
@@ -50,5 +49,10 @@ export default class FilmPresenter {
       evt.preventDefault();
       this.#removePopup();
     }
+  };
+
+  destroy = () => {
+    remove(this.#filmCard);
+    remove(this.#popup);
   };
 }
