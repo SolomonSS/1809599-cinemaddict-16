@@ -1,6 +1,6 @@
 import AbstractView from './abstract-view.js';
 
-const SortTypes = {
+export const SortTypes = {
   DEFAULT: 'default',
   DATE: 'date',
   RATING:'rating',

@@ -1,7 +1,7 @@
 import {createElement} from '../utils/render.js';
 
 export default class AbstractView {
-  #element = null;
+  _element = null;
   _callback = {};
 
   constructor() {
@@ -11,10 +11,10 @@ export default class AbstractView {
   }
 
   get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
+    if (!this._element) {
+      this._element = createElement(this.template);
     }
-    return this.#element;
+    return this._element;
   }
 
   get template() {
@@ -22,6 +22,7 @@ export default class AbstractView {
   }
 
   removeElement() {
-    this.#element = null;
+    this._element.remove();
+    this._element = null;
   }
 }
