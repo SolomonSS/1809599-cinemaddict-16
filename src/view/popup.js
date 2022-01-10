@@ -1,4 +1,4 @@
-import AbstractView from './abstract-view.js';
+import SmartView from './smart-view.js';
 
 const renderGenres = (genres) => {
   let genresList = '';
@@ -105,7 +105,9 @@ const popupTemplate = (popup) =>
         <ul class="film-details__comments-list"></ul>
             ${renderComments(popup.comments)}
         <div class="film-details__new-comment">
-          <div class="film-details__add-emoji-label"></div>
+          <div class="film-details__add-emoji-label">
+          <span class="film-details__comment-emoji"><img class="comment-emoji" src="${popup.commentEmoji}" width="55" height="55" alt=""></span>
+          </div>
 
           <label class="film-details__comment-label">
             <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
@@ -138,25 +140,40 @@ const popupTemplate = (popup) =>
     </form>
   </section>`;
 
-export default class PopupView extends AbstractView{
-  #film;
+export default class PopupView extends SmartView {
 
   constructor(film) {
     super();
-    this.#film = film;
+    this._data = film;
+    this.#setInnerHandlers();
   }
 
   get template() {
-    return popupTemplate(this.#film);
+    return popupTemplate(this._data);
   }
 
-  setEscHandler = (callback) => {
-    this._callback.escKeyDown = callback;
-    document.addEventListener('submit', this.#formSubmitHandler);
+  restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setCloseButtonHandler(this._callback.closeButton);
   }
 
-  #formSubmitHandler = (evt) => {
+  #setInnerHandlers = () => {
+    this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#emojiHandler);
+  }
+
+  setCloseButtonHandler = (callback) => {
+    this._callback.closeButton = callback;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler);
+  };
+
+  #clickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.escKeyDown();
+    this._callback.closeButton();
+  };
+
+  #emojiHandler = (evt) => {
+    this.element.querySelector('.comment-emoji').src = evt.target.src;
+    this.updateData({commentEmoji: evt.target.src});
   }
 }
+

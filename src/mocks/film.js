@@ -77,6 +77,7 @@ const generateFilmCard = () => {
     isAddedToWatchList: Boolean(getRandomInteger()),
     isWatched: Boolean(getRandomInteger()),
     isAddedToFavorite: Boolean(getRandomInteger()),
+    commentEmoji: '',
   };
 };
 
