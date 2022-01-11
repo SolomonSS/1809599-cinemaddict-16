@@ -3,7 +3,7 @@ import SiteMenuView from '../view/menu-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
 import SortListView, {SortTypes} from '../view/sort.js';
 import MainSheme from '../view/main-sheme.js';
-import {render, RenderPosition, sortByDate, sortByRating, updateItem} from '../utils/render.js';
+import {remove, render, RenderPosition, sortByDate, sortByRating, updateItem} from '../utils/render.js';
 import FilmPresenter from './film-presenter.js';
 
 let startIndex = 0;
@@ -17,9 +17,9 @@ export default class FilmListPresenter {
   #mainSheme = new MainSheme();
   #mainContainer;
   #filmPresenter = new Map();
-  _filmsListContainer;
-  _filmsList;
-  _sortedFilmList;
+  #filmsListContainer;
+  #sourcedFilms;
+  #sortedFilms;
   _currentSortType = SortTypes.DEFAULT;
 
   constructor(main) {
@@ -27,32 +27,37 @@ export default class FilmListPresenter {
   }
 
   init = (films) => {
-    this._filmsList = films;
-    this._sortedFilmList = films;
+    this.#sourcedFilms = films;
+    this.#sortedFilms = films;
     this.#renderPageElements();
-    this._filmsListContainer = document.querySelector('.films-list__container');
+    this.#filmsListContainer = document.querySelector('.films-list__container');
     this.#renderFilmCards();
-    this.#showMoreButton.setClickHandler(this.#renderFilmCards);
   };
 
   #renderPageElements = () => {
     render(this.#mainContainer, this.#siteMenu.element, RenderPosition.AFTERBEGIN);
     this.#renderSortView();
     render(this.#mainContainer, this.#mainSheme.element, RenderPosition.BEFOREEND);
-    render(this.#mainContainer, this.#showMoreButton.element, RenderPosition.BEFOREEND);
+    this.#renderShowMoreButton();
     render(this.#mainContainer, this.#topRated.element, RenderPosition.BEFOREEND);
   };
 
   #renderFilmCards = () => {
-    const nextCards = this._sortedFilmList.slice(startIndex, startIndex + FILM_COUNT_PER_CLICK);
+    this.#clearMoviesList();
+    const nextCards = this.#sortedFilms.slice(0, startIndex + FILM_COUNT_PER_CLICK);
     startIndex += FILM_COUNT_PER_CLICK;
     nextCards.forEach(this.#renderFilmCard);
-    if (startIndex >= this._sortedFilmList.length) {
-      this.#buttonRemove();
+    if (startIndex < this.#sortedFilms.length) {
+      this.#renderShowMoreButton();
     }
   };
 
-//Комментарий 2
+  #renderShowMoreButton = () =>{
+    this.#showMoreButton = new ShowMoreButtonView();
+    this.#showMoreButton.setClickHandler(this.#renderFilmCards);
+    render(this.#mainContainer, this.#showMoreButton.element, RenderPosition.BEFOREEND);
+  }
+
   #renderSortView = () => {
     render(this.#mainContainer, this.#sortList.element, RenderPosition.BEFOREEND);
     this.#sortList.setSortTypeHandler(this.#handleSortTypeChange);
@@ -62,6 +67,7 @@ export default class FilmListPresenter {
     if(this._currentSortType === sortType){
       return;
     }
+    startIndex = 0;
     this.#sortFilms(sortType);
     this.#clearMoviesList();
     this.#renderFilmCards();
@@ -70,37 +76,36 @@ export default class FilmListPresenter {
   #sortFilms = (sortType) => {
     switch(sortType){
       case(SortTypes.DATE):
-        this._sortedFilmList.sort(sortByDate);
+        this.#sortedFilms.sort(sortByDate);
         break;
       case(SortTypes.RATING):
-        this._sortedFilmList.sort(sortByRating);
+        this.#sortedFilms.sort(sortByRating);
         break;
       default:
-        this._sortedFilmList = this._filmsList;
+        this.#sortedFilms = this.#sourcedFilms;
     }
     this._currentSortType = sortType;
   }
 
   #renderFilmCard = (card) => {
-    const filmPresenter = new FilmPresenter(this._filmsListContainer, this.#handleFilmChange);
+    const filmPresenter = new FilmPresenter(this.#filmsListContainer, this.#handleFilmChange);
     filmPresenter.init(card);
     this.#filmPresenter.set(card.id, filmPresenter);
   };
 
   #buttonRemove = () => {
-    this.#showMoreButton.removeElement();
+    remove(this.#showMoreButton);
   };
 
   #clearMoviesList = () => {
     this.#filmPresenter.forEach((presenter) => presenter.destroy());
     this.#filmPresenter.clear();
-    startIndex = 0;
     this.#buttonRemove();
   };
 
   #handleFilmChange = (updatedFilm) => {
-    this._filmsList = updateItem(this._filmsList, updatedFilm);
-    this._sortedFilmList = updateItem(this._sortedFilmList, updatedFilm);
+    this.#sourcedFilms = updateItem(this.#sourcedFilms, updatedFilm);
+    this.#sortedFilms = updateItem(this.#sortedFilms, updatedFilm);
     this.#filmPresenter.get(updatedFilm.id).init(updatedFilm);
   }
 }

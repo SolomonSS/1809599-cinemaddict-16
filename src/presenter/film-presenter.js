@@ -56,10 +56,8 @@ export default class FilmPresenter {
 
   #addPopup = () => {
     this.#removePopup();
-    //remove(this.#popup);
     this.#renderPopup();
     this.#popup.restoreHandlers();
-    //this.#popup.element.querySelector('.film-details__close-btn').addEventListener('click', this.#removePopup);
     document.addEventListener('keydown', this.#escKeyDownHandler);
   };
 
@@ -88,6 +86,7 @@ export default class FilmPresenter {
   }
 
   destroy = () => {
+    this.#filmCard.element.remove();
     this.#filmCard.removeElement();
     this.#filmCard = null;
   };
