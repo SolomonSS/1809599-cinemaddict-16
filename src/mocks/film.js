@@ -1,4 +1,5 @@
 import {getRandomArray, getRandomInteger} from './utils.js';
+import {nanoid} from 'nanoid';
 
 const FILM_CARDS_COUNT = 20;
 const DESCRIPTIONS = [
@@ -59,6 +60,7 @@ const generateFilmCard = () => {
   const descriptionValue = getFullDescription();
   const name = NAMES[getRandomInteger(0, NAMES.length - 1)];
   return {
+    id: nanoid(),
     filmName: name,
     originalFilmName: name.toUpperCase(),
     poster: getImgAddress('posters', POSTERS),
