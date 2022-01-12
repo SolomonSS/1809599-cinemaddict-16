@@ -1,9 +1,9 @@
-import AbstractView from './abstract-view.js';
+import SmartView from './smart-view.js';
 
 export const SortTypes = {
   DEFAULT: 'default',
   DATE: 'date',
-  RATING:'rating',
+  RATING: 'rating',
 };
 
 const createSortList = () => (
@@ -14,7 +14,7 @@ const createSortList = () => (
   </ul>`
 );
 
-export default class SortListView extends AbstractView{
+export default class SortListView extends SmartView {
   get template() {
     return createSortList();
   }
@@ -22,7 +22,7 @@ export default class SortListView extends AbstractView{
   setSortTypeHandler = (callback) => {
     this._callback.sortTypeChange = callback;
     this.element.addEventListener('click', this.#sortTypeHandler);
-  }
+  };
 
   #sortTypeHandler = (evt) => {
     if (evt.target.tagName !== 'A') {
@@ -31,6 +31,21 @@ export default class SortListView extends AbstractView{
 
     evt.preventDefault();
     this._callback.sortTypeChange(evt.target.dataset.sortType);
-  }
+    this.#renderActiveSortType(evt.target);
+    this.updateData();
+  };
+
+  #renderActiveSortType = (sortButton) => {
+    this.element.querySelectorAll('.sort__button').forEach((button) => {
+      if (button.classList.contains('sort__button--active')) {
+        button.classList.remove('sort__button--active');
+      }
+    });
+    sortButton.classList.add('sort__button--active');
+  };
+
+  restoreHandlers = () => {
+    this.setSortTypeHandler(this._callback.sortTypeChange);
+  };
 }
 

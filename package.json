@@ -16,6 +16,7 @@
     "webpack-cli": "4.9.1",
     "webpack-dev-server": "4.4.0",
     "nanoid": "3.1.30",
+    "dayjs": "1.10.7",
     "@babel/core": "7.16.0",
     "@babel/eslint-parser": "7.16.0",
     "@babel/plugin-proposal-class-properties": "7.16.0",

@@ -52,40 +52,40 @@ export default class FilmListPresenter {
     }
   };
 
-  #renderShowMoreButton = () =>{
+  #renderShowMoreButton = () => {
     this.#showMoreButton = new ShowMoreButtonView();
     this.#showMoreButton.setClickHandler(this.#renderFilmCards);
     render(this.#mainContainer, this.#showMoreButton.element, RenderPosition.BEFOREEND);
-  }
+  };
 
   #renderSortView = () => {
     render(this.#mainContainer, this.#sortList.element, RenderPosition.BEFOREEND);
     this.#sortList.setSortTypeHandler(this.#handleSortTypeChange);
-  }
+  };
 
   #handleSortTypeChange = (sortType) => {
-    if(this._currentSortType === sortType){
+    if (this._currentSortType === sortType) {
       return;
     }
     startIndex = 0;
     this.#sortFilms(sortType);
     this.#clearMoviesList();
     this.#renderFilmCards();
-  }
+  };
 
   #sortFilms = (sortType) => {
-    switch(sortType){
+    switch (sortType) {
       case(SortTypes.DATE):
         this.#sortedFilms.sort(sortByDate);
         break;
       case(SortTypes.RATING):
         this.#sortedFilms.sort(sortByRating);
         break;
-      default:
+      case(SortTypes.DEFAULT):
         this.#sortedFilms = this.#sourcedFilms;
     }
     this._currentSortType = sortType;
-  }
+  };
 
   #renderFilmCard = (card) => {
     const filmPresenter = new FilmPresenter(this.#filmsListContainer, this.#handleFilmChange);
@@ -107,5 +107,5 @@ export default class FilmListPresenter {
     this.#sourcedFilms = updateItem(this.#sourcedFilms, updatedFilm);
     this.#sortedFilms = updateItem(this.#sortedFilms, updatedFilm);
     this.#filmPresenter.get(updatedFilm.id).init(updatedFilm);
-  }
+  };
 }

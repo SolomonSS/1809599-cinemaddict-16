@@ -23,9 +23,6 @@ export default class FilmPresenter {
     this.#filmCard = new FilmCardView(this.#film);
     this.#popup = new PopupView(this.#film);
     this.#filmCard.setClickHandler(this.#addPopup);
-    this.#filmCard.setIsFavoriteClickHandler(this.#handleIsAddedToFavorite);
-    this.#filmCard.setIsWatchedClickHandler(this.#handleIsWatched);
-    this.#filmCard.setIsAddedToWatchListClickHandler(this.#handleIsAddedToWatchList);
     this.#popup.setCloseButtonHandler(this.#removePopup);
 
     if (prevFilmComponent === null || prevPopupComponent === null) {
@@ -33,11 +30,11 @@ export default class FilmPresenter {
       return;
     }
 
-    if (this.#filmsContainer.element.contains(prevPopupComponent)) {
+    if (this.#filmsContainer.contains(prevPopupComponent.element)) {
       replace(this.#filmCard, prevFilmComponent);
     }
 
-    if (this.#filmsContainer.element.contains(prevPopupComponent)) {
+    if (this.#filmsContainer.contains(prevPopupComponent.element)) {
       replace(this.#popup, prevPopupComponent);
     }
 
@@ -72,18 +69,6 @@ export default class FilmPresenter {
       this.#removePopup();
     }
   };
-
-  #handleIsAddedToFavorite = () =>{
-    this.#changedFilm({...this.#film, isFavorite : !this.#film.isFavorite});
-  }
-
-  #handleIsWatched = () => {
-    this.#changedFilm({...this.#film, isWatched : !this.#film.isWatched});
-  }
-
-  #handleIsAddedToWatchList = () => {
-    this.#changedFilm({...this.#film, isAddedToWatchList : !this.#film.isAddedToWatchList});
-  }
 
   destroy = () => {
     this.#filmCard.element.remove();
