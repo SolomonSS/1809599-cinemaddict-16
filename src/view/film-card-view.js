@@ -26,7 +26,6 @@ export default class FilmCardView extends SmartView {
   constructor(film) {
     super();
     this._data = {...film};
-    this.restoreHandlers();
   }
 
   get template() {
@@ -38,28 +37,24 @@ export default class FilmCardView extends SmartView {
     this.element.addEventListener('click', this.#filmCardClickHandler);
   };
 
-  #filmCardClickHandler = (evt) => {
-    if (!(evt.target.closest('.film-card__controls'))) {
-      this._callback.filmCardClick();
-    }
+  restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.element.addEventListener('click', this.#filmCardClickHandler);
   };
 
-  #addedToWatchListClickHandler = () => {
-    this.updateData({
-      isAddedToWatchList: !this._data.isAddedToWatchList
-    });
+  setIsFavoriteClickHandler = (callback) => {
+    this._callback.isFavorite = callback;
+    this.element.querySelector('.film-card__controls-item--favorite').addEventListener('click', this.#favoriteClickHandler);
   };
 
-  #watchedClickHandler = () => {
-    this.updateData({
-      isWatched: !this._data.isWatched
-    });
+  setIsWatchedClickHandler = (callback) => {
+    this._callback.isWatched = callback;
+    this.element.querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this.#watchedClickHandler);
   };
 
-  #favoriteClickHandler = () => {
-    this.updateData({
-      isAddedToFavorite: !this._data.isAddedToFavorite
-    });
+  setIsAddedToWatchListClickHandler = (callback) => {
+    this._callback.isAddedToWatchList = callback;
+    this.element.querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this.#addedToWatchListClickHandler);
   };
 
   #setInnerHandlers = () => {
@@ -68,8 +63,30 @@ export default class FilmCardView extends SmartView {
     this.element.querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this.#addedToWatchListClickHandler);
   }
 
-  restoreHandlers = () => {
-    this.setFilmCardClickHandler(this._callback.filmCardClick);
-    this.#setInnerHandlers();
+  #filmCardClickHandler = (evt) => {
+    if (!(evt.target.closest('.film-card__controls'))) {
+      this._callback.filmCardClick();
+    }
+  };
+
+  #addedToWatchListClickHandler = () => {
+    this._callback.isAddedToWatchList();
+    this.updateData({
+      isAddedToWatchList: !this._data.isAddedToWatchList
+    });
+  };
+
+  #watchedClickHandler = () => {
+    this._callback.isWatched();
+    this.updateData({
+      isWatched: !this._data.isWatched
+    });
+  };
+
+  #favoriteClickHandler = () => {
+    this._callback.isFavorite();
+    this.updateData({
+      isAddedToFavorite: !this._data.isAddedToFavorite
+    });
   };
 }

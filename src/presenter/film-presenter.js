@@ -9,7 +9,7 @@ export default class FilmPresenter {
   #filmCard = null;
   #popup = null;
   #filmsContainer = null;
-  #changedData;
+  #changedData = null;
 
   constructor(container, changeData) {
     this.#filmsContainer = container;
@@ -23,6 +23,9 @@ export default class FilmPresenter {
     this.#filmCard = new FilmCardView(this.#film);
     this.#popup = new PopupView(this.#film);
     this.#filmCard.setFilmCardClickHandler(this.#addPopup);
+    this.#filmCard.setIsFavoriteClickHandler(this.#handleIsAddedToFavorite);
+    this.#filmCard.setIsWatchedClickHandler(this.#handleIsWatched);
+    this.#filmCard.setIsAddedToWatchListClickHandler(this.#handleIsAddedToWatchList);
     this.#popup.setCloseButtonHandler(this.#removePopup);
 
     if (prevFilmComponent === null || prevPopupComponent === null) {
@@ -69,6 +72,18 @@ export default class FilmPresenter {
       this.#removePopup();
     }
   };
+
+  #handleIsAddedToFavorite = () =>{
+    this.#changedData = ({...this.#film, isAddedToFavorite : !this.#film.isAddedToFavorite});
+  }
+
+  #handleIsWatched = () => {
+    this.#changedData = ({...this.#film, isWatched : !this.#film.isWatched});
+  }
+
+  #handleIsAddedToWatchList = () => {
+    this.#changedData = ({...this.#film, isAddedToWatchList : !this.#film.isAddedToWatchList});
+  }
 
   destroy = () => {
     this.#filmCard.element.remove();

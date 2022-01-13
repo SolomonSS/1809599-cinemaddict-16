@@ -27,7 +27,7 @@ export default class FilmListPresenter {
 
   init = (films) => {
     this.#sourcedFilms = [...films];
-    this.#sortedFilms = films;
+    this.#sortedFilms = [...films];
     this.#renderPageElements();
     this.#filmsListContainer = document.querySelector('.films-list__container');
     this.#renderFilmCards();
