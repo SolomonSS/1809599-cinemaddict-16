@@ -9,11 +9,11 @@ export default class FilmPresenter {
   #filmCard = null;
   #popup = null;
   #filmsContainer = null;
-  #changedFilm;
+  #changedData;
 
   constructor(container, changeData) {
     this.#filmsContainer = container;
-    this.#changedFilm = changeData;
+    this.#changedData = changeData;
   }
 
   init = (film) => {
@@ -22,7 +22,7 @@ export default class FilmPresenter {
     const prevPopupComponent = this.#popup;
     this.#filmCard = new FilmCardView(this.#film);
     this.#popup = new PopupView(this.#film);
-    this.#filmCard.setClickHandler(this.#addPopup);
+    this.#filmCard.setFilmCardClickHandler(this.#addPopup);
     this.#popup.setCloseButtonHandler(this.#removePopup);
 
     if (prevFilmComponent === null || prevPopupComponent === null) {

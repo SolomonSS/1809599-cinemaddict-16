@@ -6,15 +6,14 @@ import MainSheme from '../view/main-sheme.js';
 import {remove, render, RenderPosition, sortByDate, sortByRating, updateItem} from '../utils/render.js';
 import FilmPresenter from './film-presenter.js';
 
-let startIndex = 0;
-const FILM_COUNT_PER_CLICK = 5;
-
 export default class FilmListPresenter {
   #topRated = new TopRatedTemplateView();
   #siteMenu = new SiteMenuView();
   #showMoreButton = new ShowMoreButtonView();
   #sortList = new SortListView();
   #mainSheme = new MainSheme();
+  #FILM_COUNT_PER_CLICK = 5;
+  #startIndex = 0;
   #mainContainer;
   #filmPresenter = new Map();
   #filmsListContainer;
@@ -27,7 +26,7 @@ export default class FilmListPresenter {
   }
 
   init = (films) => {
-    this.#sourcedFilms = films;
+    this.#sourcedFilms = [...films];
     this.#sortedFilms = films;
     this.#renderPageElements();
     this.#filmsListContainer = document.querySelector('.films-list__container');
@@ -44,10 +43,10 @@ export default class FilmListPresenter {
 
   #renderFilmCards = () => {
     this.#clearMoviesList();
-    const nextCards = this.#sortedFilms.slice(0, startIndex + FILM_COUNT_PER_CLICK);
-    startIndex += FILM_COUNT_PER_CLICK;
+    const nextCards = this.#sortedFilms.slice(0, this.#startIndex + this.#FILM_COUNT_PER_CLICK);
+    this.#startIndex += this.#FILM_COUNT_PER_CLICK;
     nextCards.forEach(this.#renderFilmCard);
-    if (startIndex < this.#sortedFilms.length) {
+    if (this.#startIndex < this.#sortedFilms.length) {
       this.#renderShowMoreButton();
     }
   };
@@ -67,7 +66,7 @@ export default class FilmListPresenter {
     if (this._currentSortType === sortType) {
       return;
     }
-    startIndex = 0;
+    this.#startIndex = 0;
     this.#sortFilms(sortType);
     this.#clearMoviesList();
     this.#renderFilmCards();
@@ -82,7 +81,7 @@ export default class FilmListPresenter {
         this.#sortedFilms.sort(sortByRating);
         break;
       case(SortTypes.DEFAULT):
-        this.#sortedFilms = this.#sourcedFilms;
+        this.#sortedFilms = [...this.#sourcedFilms];
     }
     this._currentSortType = sortType;
   };

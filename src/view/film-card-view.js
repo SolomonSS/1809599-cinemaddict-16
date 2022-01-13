@@ -22,46 +22,54 @@ const createFilmCardTemplate = (film) => `<article class="film-card">
 `;
 
 export default class FilmCardView extends SmartView {
-  #film;
 
   constructor(film) {
     super();
-    this.#film = film;
+    this._data = {...film};
+    this.restoreHandlers();
   }
 
   get template() {
-    return createFilmCardTemplate(this.#film);
+    return createFilmCardTemplate(this._data);
   }
 
-  setClickHandler = (callback) => {
-    this._callback.click = callback;
-    this.element.addEventListener('click', this.#clickHandler);
+  setFilmCardClickHandler = (callback) => {
+    this._callback.filmCardClick = callback;
+    this.element.addEventListener('click', this.#filmCardClickHandler);
   };
 
-  #clickHandler = (evt) => {
+  #filmCardClickHandler = (evt) => {
     if (!(evt.target.closest('.film-card__controls'))) {
-      this._callback.click();
-    } else {
-      evt.preventDefault();
-      evt.target.classList.remove('film-card__controls-item--active');
-      this.#controlButtonsClickHandler(evt.target);
+      this._callback.filmCardClick();
     }
-    this.updateData(this.#film);
   };
+
+  #addedToWatchListClickHandler = () => {
+    this.updateData({
+      isAddedToWatchList: !this._data.isAddedToWatchList
+    });
+  };
+
+  #watchedClickHandler = () => {
+    this.updateData({
+      isWatched: !this._data.isWatched
+    });
+  };
+
+  #favoriteClickHandler = () => {
+    this.updateData({
+      isAddedToFavorite: !this._data.isAddedToFavorite
+    });
+  };
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.film-card__controls-item--favorite').addEventListener('click', this.#favoriteClickHandler);
+    this.element.querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this.#watchedClickHandler);
+    this.element.querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this.#addedToWatchListClickHandler);
+  }
 
   restoreHandlers = () => {
-    this.setClickHandler(this._callback.click);
-  }
-
-  #controlButtonsClickHandler = (evtClick) => {
-    if(evtClick.classList.contains('film-card__controls-item--add-to-watchlist')){
-      this.#film = ({...this.#film, isAddedToWatchList : !this.#film.isAddedToWatchList});
-    }
-    if(evtClick.classList.contains('film-card__controls-item--mark-as-watched')){
-      this.#film = ({...this.#film, isWatched : !this.#film.isWatched});
-    }
-    if(evtClick.classList.contains('film-card__controls-item--favorite')){
-      this.#film = ({...this.#film, isAddedToFavorite : !this.#film.isAddedToFavorite});
-    }
-  }
+    this.setFilmCardClickHandler(this._callback.filmCardClick);
+    this.#setInnerHandlers();
+  };
 }
