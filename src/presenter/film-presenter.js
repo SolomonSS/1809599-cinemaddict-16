@@ -9,11 +9,13 @@ export default class FilmPresenter {
   #filmCard = null;
   #popup = null;
   #filmsContainer = null;
-  #changedData = null;
+  #changeData = null;
+  #changeMode = null;
 
-  constructor(container, changeData) {
+  constructor(container, changeData, changeMode) {
     this.#filmsContainer = container;
-    this.#changedData = changeData;
+    this.#changeData = changeData;
+    this.#changeMode = changeMode;
   }
 
   init = (film) => {
@@ -54,6 +56,10 @@ export default class FilmPresenter {
     this.#popup.removeElement();
   };
 
+  resetView = () => {
+    this.#filmCard.reset(this.#film);
+  };
+
   #addPopup = () => {
     this.#removePopup();
     this.#renderPopup();
@@ -73,17 +79,20 @@ export default class FilmPresenter {
     }
   };
 
-  #handleIsAddedToFavorite = () =>{
-    this.#changedData = ({...this.#film, isAddedToFavorite : !this.#film.isAddedToFavorite});
-  }
+  #handleIsAddedToFavorite = () => {
+    this.#changeData({...this.#film, isAddedToFavorite: !this.#film.isAddedToFavorite});
+    this.#filmCard.reset(this.#film);
+  };
 
   #handleIsWatched = () => {
-    this.#changedData = ({...this.#film, isWatched : !this.#film.isWatched});
-  }
+    this.#changeData({...this.#film, isWatched: !this.#film.isWatched});
+    this.#filmCard.reset(this.#film);
+  };
 
   #handleIsAddedToWatchList = () => {
-    this.#changedData = ({...this.#film, isAddedToWatchList : !this.#film.isAddedToWatchList});
-  }
+    this.#changeData({...this.#film, isAddedToWatchList: !this.#film.isAddedToWatchList});
+    this.#filmCard.reset(this.#film);
+  };
 
   destroy = () => {
     this.#filmCard.element.remove();

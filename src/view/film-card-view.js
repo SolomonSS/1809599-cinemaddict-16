@@ -37,11 +37,6 @@ export default class FilmCardView extends SmartView {
     this.element.addEventListener('click', this.#filmCardClickHandler);
   };
 
-  restoreHandlers = () => {
-    this.#setInnerHandlers();
-    this.element.addEventListener('click', this.#filmCardClickHandler);
-  };
-
   setIsFavoriteClickHandler = (callback) => {
     this._callback.isFavorite = callback;
     this.element.querySelector('.film-card__controls-item--favorite').addEventListener('click', this.#favoriteClickHandler);
@@ -57,11 +52,16 @@ export default class FilmCardView extends SmartView {
     this.element.querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this.#addedToWatchListClickHandler);
   };
 
-  #setInnerHandlers = () => {
+  reset = (film) => {
+    this.updateData({...film});
+  }
+
+  restoreHandlers = () => {
     this.element.querySelector('.film-card__controls-item--favorite').addEventListener('click', this.#favoriteClickHandler);
     this.element.querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this.#watchedClickHandler);
     this.element.querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this.#addedToWatchListClickHandler);
-  }
+    this.element.addEventListener('click', this.#filmCardClickHandler);
+  };
 
   #filmCardClickHandler = (evt) => {
     if (!(evt.target.closest('.film-card__controls'))) {
@@ -69,24 +69,18 @@ export default class FilmCardView extends SmartView {
     }
   };
 
-  #addedToWatchListClickHandler = () => {
+  #addedToWatchListClickHandler = (evt) => {
+    evt.preventDefault();
     this._callback.isAddedToWatchList();
-    this.updateData({
-      isAddedToWatchList: !this._data.isAddedToWatchList
-    });
   };
 
-  #watchedClickHandler = () => {
+  #watchedClickHandler = (evt) => {
+    evt.preventDefault();
     this._callback.isWatched();
-    this.updateData({
-      isWatched: !this._data.isWatched
-    });
   };
 
-  #favoriteClickHandler = () => {
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
     this._callback.isFavorite();
-    this.updateData({
-      isAddedToFavorite: !this._data.isAddedToFavorite
-    });
   };
 }

@@ -20,6 +20,7 @@ export default class FilmListPresenter {
   #sourcedFilms;
   #sortedFilms;
   _currentSortType = SortTypes.DEFAULT;
+  #renderMode = false;
 
   constructor(main) {
     this.#mainContainer = main;
@@ -87,7 +88,7 @@ export default class FilmListPresenter {
   };
 
   #renderFilmCard = (card) => {
-    const filmPresenter = new FilmPresenter(this.#filmsListContainer, this.#handleFilmChange);
+    const filmPresenter = new FilmPresenter(this.#filmsListContainer, this.#handleFilmChange, this.#handleModeChange, this.#renderMode);
     filmPresenter.init(card);
     this.#filmPresenter.set(card.id, filmPresenter);
   };
@@ -106,5 +107,10 @@ export default class FilmListPresenter {
     this.#sourcedFilms = updateItem(this.#sourcedFilms, updatedFilm);
     this.#sortedFilms = updateItem(this.#sortedFilms, updatedFilm);
     this.#filmPresenter.get(updatedFilm.id).init(updatedFilm);
+    this.#renderMode= true;
   };
+
+  #handleModeChange = () => {
+    this.#filmPresenter.forEach((presenter) => presenter.resetView());
+  }
 }
