@@ -2,18 +2,25 @@ import FilmCardView from '../view/film-card-view.js';
 import {remove, render, RenderPosition, replace} from '../utils/render.js';
 import PopupView from '../view/popup.js';
 
-const pageFooter = document.querySelector('.footer');
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING'
+};
 
 export default class FilmPresenter {
   #film = null;
   #filmCard = null;
   #popup = null;
   #filmsContainer = null;
-  #changedFilm;
+  #changeData = null;
+  #changeMode = null;
+  #pageFooter = document.querySelector('.footer');
+  #mode = Mode.DEFAULT;
 
-  constructor(container, changeData) {
+  constructor(container, changeData, changeMode) {
     this.#filmsContainer = container;
-    this.#changedFilm = changeData;
+    this.#changeData = changeData;
+    this.#changeMode = changeMode;
   }
 
   init = (film) => {
@@ -22,7 +29,8 @@ export default class FilmPresenter {
     const prevPopupComponent = this.#popup;
     this.#filmCard = new FilmCardView(this.#film);
     this.#popup = new PopupView(this.#film);
-    this.#filmCard.setClickHandler(this.#addPopup);
+
+    this.#filmCard.setFilmCardClickHandler(this.#addPopup);
     this.#filmCard.setIsFavoriteClickHandler(this.#handleIsAddedToFavorite);
     this.#filmCard.setIsWatchedClickHandler(this.#handleIsWatched);
     this.#filmCard.setIsAddedToWatchListClickHandler(this.#handleIsAddedToWatchList);
@@ -33,11 +41,11 @@ export default class FilmPresenter {
       return;
     }
 
-    if (this.#filmsContainer.element.contains(prevPopupComponent)) {
+    if (this.#mode === Mode.DEFAULT) {
       replace(this.#filmCard, prevFilmComponent);
     }
 
-    if (this.#filmsContainer.element.contains(prevPopupComponent)) {
+    if (this.#mode === Mode.EDITING) {
       replace(this.#popup, prevPopupComponent);
     }
 
@@ -46,24 +54,23 @@ export default class FilmPresenter {
   };
 
   #renderPopup = () => {
-    render(pageFooter, this.#popup.element, RenderPosition.BEFOREEND);
+    render(this.#pageFooter, this.#popup.element, RenderPosition.BEFOREEND);
   };
 
-  removePopupElement = () => {
-    this.#popup.element.remove();
-    this.#popup.removeElement();
+  resetView = () => {
+    this.#filmCard.reset(this.#film);
   };
 
   #addPopup = () => {
-    this.#removePopup();
     this.#renderPopup();
-    this.#popup.restoreHandlers();
     document.addEventListener('keydown', this.#escKeyDownHandler);
+    this.#mode = Mode.EDITING;
   };
 
   #removePopup = () => {
-    this.removePopupElement();
+    this.#popup.element.remove();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#mode = Mode.DEFAULT;
   };
 
   #escKeyDownHandler = (evt) => {
@@ -73,17 +80,17 @@ export default class FilmPresenter {
     }
   };
 
-  #handleIsAddedToFavorite = () =>{
-    this.#changedFilm({...this.#film, isFavorite : !this.#film.isFavorite});
-  }
+  #handleIsAddedToFavorite = () => {
+    this.#changeData({...this.#film, isAddedToFavorite: !this.#film.isAddedToFavorite});
+  };
 
   #handleIsWatched = () => {
-    this.#changedFilm({...this.#film, isWatched : !this.#film.isWatched});
-  }
+    this.#changeData({...this.#film, isWatched: !this.#film.isWatched});
+  };
 
   #handleIsAddedToWatchList = () => {
-    this.#changedFilm({...this.#film, isAddedToWatchList : !this.#film.isAddedToWatchList});
-  }
+    this.#changeData({...this.#film, isAddedToWatchList: !this.#film.isAddedToWatchList});
+  };
 
   destroy = () => {
     this.#filmCard.element.remove();

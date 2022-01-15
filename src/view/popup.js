@@ -68,11 +68,11 @@ const popupTemplate = (popup) =>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
-              <td class="film-details__cell">${popup.realise}</td>
+              <td class="film-details__cell">${popup.realiseFullDate}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">${popup.duration}</td>
+              <td class="film-details__cell">${popup.filmDuration}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Country</td>
@@ -153,12 +153,13 @@ export default class PopupView extends SmartView {
   }
 
   restoreHandlers = () => {
-    this.#setInnerHandlers();
-    this.setCloseButtonHandler(this._callback.closeButton);
+    this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#emojiHandler);
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler);
   }
 
   #setInnerHandlers = () => {
     this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#emojiHandler);
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler);
   }
 
   setCloseButtonHandler = (callback) => {

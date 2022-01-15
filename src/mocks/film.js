@@ -1,5 +1,9 @@
 import {getRandomArray, getRandomInteger} from './utils.js';
 import {nanoid} from 'nanoid';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+dayjs.extend(duration);
+
 
 const FILM_CARDS_COUNT = 20;
 const DESCRIPTIONS = [
@@ -59,6 +63,7 @@ const getComments = () => {
 const generateFilmCard = () => {
   const descriptionValue = getFullDescription();
   const name = NAMES[getRandomInteger(0, NAMES.length - 1)];
+  const realiseDate = getRandomInteger(1990, 2022);
   return {
     id: nanoid(),
     filmName: name,
@@ -69,9 +74,10 @@ const generateFilmCard = () => {
     director: DIRECTORS[getRandomInteger(0, DIRECTORS.length-1)] ,
     writers: getRandomArray(WRITERS, 3),
     actors: ACTORS[getRandomInteger(0, ACTORS.length-1)],
-    rating: getRandomInteger(0, 10),
-    realise: getRandomInteger(1995, 2021),
-    duration: `${getRandomInteger(1, 3)}h ${getRandomInteger(0, 60)}m`,
+    rating: getRandomInteger(1, 10),
+    realise: realiseDate,
+    realiseFullDate: dayjs(`${realiseDate}-${getRandomInteger(1, 12)}-${getRandomInteger(0,30)}`).format('DD MMMM YYYY'),
+    filmDuration: dayjs.duration(getRandomInteger(75, 210), 'minutes').format('H[h] mm[m]'),
     genres: getRandomArray(GENRES, 3),
     country: COUNTRIES[getRandomInteger(0, COUNTRIES.length-1)],
     censored: `${getRandomInteger(0,18 )}+`,
@@ -85,4 +91,4 @@ const generateFilmCard = () => {
 
 
 const films = Array.from({length:FILM_CARDS_COUNT}, generateFilmCard);
-export {getFullDescription, getComments, NAMES, AUTHOR_NAMES, GENRES, films};
+export {getComments, NAMES, AUTHOR_NAMES, GENRES, films};
