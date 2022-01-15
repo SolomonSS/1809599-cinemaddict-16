@@ -68,9 +68,8 @@ export default class FilmPresenter {
   };
 
   #removePopup = () => {
-    remove(this.#popup);
+    this.#popup.element.remove();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
-    this.#changeMode();
     this.#mode = Mode.DEFAULT;
   };
 
