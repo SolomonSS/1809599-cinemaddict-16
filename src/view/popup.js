@@ -153,12 +153,13 @@ export default class PopupView extends SmartView {
   }
 
   restoreHandlers = () => {
-    this.#setInnerHandlers();
-    this.setCloseButtonHandler(this._callback.closeButton);
+    this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#emojiHandler);
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler);
   }
 
   #setInnerHandlers = () => {
     this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#emojiHandler);
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler);
   }
 
   setCloseButtonHandler = (callback) => {

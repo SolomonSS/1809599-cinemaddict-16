@@ -2,7 +2,10 @@ import FilmCardView from '../view/film-card-view.js';
 import {remove, render, RenderPosition, replace} from '../utils/render.js';
 import PopupView from '../view/popup.js';
 
-const pageFooter = document.querySelector('.footer');
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING'
+};
 
 export default class FilmPresenter {
   #film = null;
@@ -11,6 +14,8 @@ export default class FilmPresenter {
   #filmsContainer = null;
   #changeData = null;
   #changeMode = null;
+  #pageFooter = document.querySelector('.footer');
+  #mode = Mode.DEFAULT;
 
   constructor(container, changeData, changeMode) {
     this.#filmsContainer = container;
@@ -24,6 +29,7 @@ export default class FilmPresenter {
     const prevPopupComponent = this.#popup;
     this.#filmCard = new FilmCardView(this.#film);
     this.#popup = new PopupView(this.#film);
+
     this.#filmCard.setFilmCardClickHandler(this.#addPopup);
     this.#filmCard.setIsFavoriteClickHandler(this.#handleIsAddedToFavorite);
     this.#filmCard.setIsWatchedClickHandler(this.#handleIsWatched);
@@ -35,11 +41,11 @@ export default class FilmPresenter {
       return;
     }
 
-    if (this.#filmsContainer.contains(prevPopupComponent.element)) {
+    if (this.#mode === Mode.DEFAULT) {
       replace(this.#filmCard, prevFilmComponent);
     }
 
-    if (this.#filmsContainer.contains(prevPopupComponent.element)) {
+    if (this.#mode === Mode.EDITING) {
       replace(this.#popup, prevPopupComponent);
     }
 
@@ -48,12 +54,7 @@ export default class FilmPresenter {
   };
 
   #renderPopup = () => {
-    render(pageFooter, this.#popup.element, RenderPosition.BEFOREEND);
-  };
-
-  removePopupElement = () => {
-    this.#popup.element.remove();
-    this.#popup.removeElement();
+    render(this.#pageFooter, this.#popup.element, RenderPosition.BEFOREEND);
   };
 
   resetView = () => {
@@ -61,15 +62,16 @@ export default class FilmPresenter {
   };
 
   #addPopup = () => {
-    this.#removePopup();
     this.#renderPopup();
-    this.#popup.restoreHandlers();
     document.addEventListener('keydown', this.#escKeyDownHandler);
+    this.#mode = Mode.EDITING;
   };
 
   #removePopup = () => {
-    this.removePopupElement();
+    remove(this.#popup);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#changeMode();
+    this.#mode = Mode.DEFAULT;
   };
 
   #escKeyDownHandler = (evt) => {
@@ -81,17 +83,14 @@ export default class FilmPresenter {
 
   #handleIsAddedToFavorite = () => {
     this.#changeData({...this.#film, isAddedToFavorite: !this.#film.isAddedToFavorite});
-    this.#filmCard.reset(this.#film);
   };
 
   #handleIsWatched = () => {
     this.#changeData({...this.#film, isWatched: !this.#film.isWatched});
-    this.#filmCard.reset(this.#film);
   };
 
   #handleIsAddedToWatchList = () => {
     this.#changeData({...this.#film, isAddedToWatchList: !this.#film.isAddedToWatchList});
-    this.#filmCard.reset(this.#film);
   };
 
   destroy = () => {
