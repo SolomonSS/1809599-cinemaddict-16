@@ -1,6 +1,7 @@
 import FilmCardView from '../view/film-card-view.js';
 import {remove, render, RenderPosition, replace} from '../utils/render.js';
 import PopupView from '../view/popup.js';
+import {UpdateType, UserAction} from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -35,6 +36,9 @@ export default class FilmPresenter {
     this.#filmCard.setIsWatchedClickHandler(this.#handleIsWatched);
     this.#filmCard.setIsAddedToWatchListClickHandler(this.#handleIsAddedToWatchList);
     this.#popup.setCloseButtonHandler(this.#removePopup);
+    this.#popup.setFavoriteClickHandler(this.#handleIsAddedToFavorite);
+    this.#popup.setWatchedClickHandler(this.#handleIsWatched);
+    this.#popup.setWatchingListClickHandler(this.#handleIsAddedToWatchList);
 
     if (prevFilmComponent === null || prevPopupComponent === null) {
       render(this.#filmsContainer, this.#filmCard.element, RenderPosition.BEFOREEND);
@@ -81,15 +85,24 @@ export default class FilmPresenter {
   };
 
   #handleIsAddedToFavorite = () => {
-    this.#changeData({...this.#film, isAddedToFavorite: !this.#film.isAddedToFavorite});
+    this.#changeData(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.MINOR,
+      {...this.#film, isAddedToFavorite: !this.#film.isAddedToFavorite});
   };
 
   #handleIsWatched = () => {
-    this.#changeData({...this.#film, isWatched: !this.#film.isWatched});
+    this.#changeData(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.MINOR,
+      {...this.#film, isWatched: !this.#film.isWatched});
   };
 
   #handleIsAddedToWatchList = () => {
-    this.#changeData({...this.#film, isAddedToWatchList: !this.#film.isAddedToWatchList});
+    this.#changeData(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.MINOR,
+      {...this.#film, isAddedToWatchList: !this.#film.isAddedToWatchList});
   };
 
   destroy = () => {
