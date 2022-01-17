@@ -1,7 +1,7 @@
 import FilmCardView from '../view/film-card-view.js';
 import {remove, render, RenderPosition, replace} from '../utils/render.js';
 import PopupView from '../view/popup.js';
-import {UpdateType, UserAction} from '../const.js';
+import {UpdateType} from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -15,7 +15,6 @@ export default class FilmPresenter {
   #filmsContainer = null;
   #changeData = null;
   #changeMode = null;
-  #pageFooter = document.querySelector('.footer');
   #mode = Mode.DEFAULT;
 
   constructor(container, changeData, changeMode) {
@@ -39,6 +38,7 @@ export default class FilmPresenter {
     this.#popup.setFavoriteClickHandler(this.#handleIsAddedToFavorite);
     this.#popup.setWatchedClickHandler(this.#handleIsWatched);
     this.#popup.setWatchingListClickHandler(this.#handleIsAddedToWatchList);
+    this.#popup.setDeleteCommentButtonClickHandler(this.#handleDeleteCommentClick);
 
     if (prevFilmComponent === null || prevPopupComponent === null) {
       render(this.#filmsContainer, this.#filmCard.element, RenderPosition.BEFOREEND);
@@ -57,24 +57,24 @@ export default class FilmPresenter {
     remove(prevPopupComponent);
   };
 
-  #renderPopup = () => {
-    render(this.#pageFooter, this.#popup.element, RenderPosition.BEFOREEND);
-  };
-
   resetView = () => {
     this.#filmCard.reset(this.#film);
   };
 
   #addPopup = () => {
-    this.#renderPopup();
+    replace(this.#popup, this.#filmCard);
     document.addEventListener('keydown', this.#escKeyDownHandler);
+    this.#popup.setSubmitFormClickHandler(this.#handleSubmitComment);
     this.#mode = Mode.EDITING;
   };
 
   #removePopup = () => {
-    this.#popup.element.remove();
+    replace(this.#filmCard, this.#popup);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#mode = Mode.DEFAULT;
+    this.#changeData(
+      UpdateType.MINOR,
+      {...this.#film});
   };
 
   #escKeyDownHandler = (evt) => {
@@ -84,25 +84,41 @@ export default class FilmPresenter {
     }
   };
 
+  #handleDeleteCommentClick = (commentId) => {
+    this.#film.comments = this.#film.comments.filter((comment) => {
+      if (comment.id !== commentId) {
+        return true;
+      }
+    });
+    this.#changeData(
+      UpdateType.PATCH,
+      {...this.#film}
+    );
+  };
+
   #handleIsAddedToFavorite = () => {
     this.#changeData(
-      UserAction.UPDATE_MOVIE,
-      UpdateType.MINOR,
+      this.#mode === Mode.EDITING ? UpdateType.PATCH : UpdateType.MINOR,
       {...this.#film, isAddedToFavorite: !this.#film.isAddedToFavorite});
   };
 
   #handleIsWatched = () => {
     this.#changeData(
-      UserAction.UPDATE_MOVIE,
-      UpdateType.MINOR,
+      this.#mode === Mode.EDITING ? UpdateType.PATCH : UpdateType.MINOR,
       {...this.#film, isWatched: !this.#film.isWatched});
   };
 
   #handleIsAddedToWatchList = () => {
     this.#changeData(
-      UserAction.UPDATE_MOVIE,
-      UpdateType.MINOR,
+      this.#mode === Mode.EDITING ? UpdateType.PATCH : UpdateType.MINOR,
       {...this.#film, isAddedToWatchList: !this.#film.isAddedToWatchList});
+  };
+
+  #handleSubmitComment = (newComment) => {
+    this.#film.comments = this.#film.comments.push(newComment);
+    this.#changeData(
+      UpdateType.PATCH,
+      {...this.#film});
   };
 
   destroy = () => {

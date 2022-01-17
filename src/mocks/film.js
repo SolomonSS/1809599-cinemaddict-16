@@ -49,6 +49,7 @@ const getShortDescription = (description) =>{
 };
 
 const getComment = () => ({
+  id: nanoid(),
   commentText: getShortDescription(getFullDescription()),
   emotion: getImgAddress('emoji', EMOJIS),
   authorName: AUTHOR_NAMES[getRandomInteger(0, AUTHOR_NAMES.length-1)],

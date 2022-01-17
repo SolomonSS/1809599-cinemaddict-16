@@ -1,4 +1,6 @@
 import SmartView from './smart-view.js';
+import {nanoid} from 'nanoid';
+import he from 'he';
 
 const renderGenres = (genres) => {
   let genresList = '';
@@ -18,9 +20,9 @@ const renderComments = (comments) => {
             <div>
               <p class="film-details__comment-text">${comment.commentText}</p>
               <p class="film-details__comment-info">
-                <span class="film-details__comment-author">${comment.authorName}</span>
-                <span class="film-details__comment-day">${comment.commentDate}</span>
-                <button class="film-details__comment-delete">Delete</button>
+                <span class="film-details__comment-author">${comment.authorName ? comment.authorName : ''}</span>
+                <span class="film-details__comment-day">${comment.commentDate ? comment.commentDate : ''}</span>
+                <button id="${comment.id}" class="film-details__comment-delete">Delete</button>
               </p>
             </div>
           </li>`;
@@ -178,6 +180,38 @@ export default class PopupView extends SmartView {
     this._callback.watchingList = callback;
     this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchListClickHandler);
   };
+
+  setDeleteCommentButtonClickHandler = (callback) => {
+    this._callback.deleteCommentClick = callback;
+    const buttons = this.element.querySelectorAll('.film-details__comment-delete');
+    if(buttons){
+      buttons.forEach((button) => {button.addEventListener('click', this.#deleteCommentClick);});
+    }
+  }
+
+  setSubmitFormClickHandler = (callback) =>{
+    this._callback.submitComment = callback;
+    document.addEventListener('keydown', this.#submitFormKeyDown);
+  }
+
+  #submitFormKeyDown = (evt) => {
+    if(evt.key === 'Enter' && evt.key === 'Control' && evt.which === 13 && evt.which === 17){//Условие не срабатывает
+      const newComment = {
+        id: nanoid(),
+        commentText: he.encode(this.element.querySelector('.film-details__comment-input').value),
+        emotion: this.element.querySelector('.comment-emoji').src,
+      };
+      this._callback.submitComment(newComment);
+    }
+  }
+
+  #deleteCommentClick = (evt) => {
+    if(evt.target.tagName !== 'BUTTON'){
+      return;
+    }
+    evt.preventDefault();
+    this._callback.deleteCommentClick(evt.target.id);
+  }
 
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
