@@ -23,7 +23,9 @@
     "@babel/plugin-proposal-nullish-coalescing-operator": "7.16.0",
     "@babel/plugin-proposal-optional-chaining": "7.16.0",
     "babel-loader": "8.2.3",
-    "he": "1.2.0"
+    "he": "1.2.0",
+    "chart.js": "2.9.4",
+    "chartjs-plugin-datalabels": "0.7.0"
   },
   "engines": {
     "node": "16"

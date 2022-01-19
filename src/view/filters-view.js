@@ -1,10 +1,11 @@
 import AbstractView from './abstract-view.js';
+import {MenuItem} from '../const.js';
 
 const createFilterItemTemplate = (filter, currentFilterType) => {
   const {type, name, count} = filter;
 
   return (
-    `<a href="#all" id = '${type}' class="main-navigation__item ${type === currentFilterType ? 'main-navigation__item--active' : ''}">${name}<span class="main-navigation__item-count">${count}</span></a>`
+    `<a href="#all" id = '${type}' data-menu-type = '${MenuItem.MOVIES}' class="main-navigation__item ${type === currentFilterType ? 'main-navigation__item--active' : ''}">${name}<span class="main-navigation__item-count">${count}</span></a>`
   );
 };
 
@@ -12,22 +13,24 @@ const createFilterTemplate = (filterItems, currentFilterType) => {
   const filterItemsTemplate = filterItems
     .map((filter) => createFilterItemTemplate(filter, currentFilterType))
     .join('');
-  return`<nav class="main-navigation">
+  return `<nav class="main-navigation">
     <div class="main-navigation__items">
       ${filterItemsTemplate}
     </div>
-    <a href="#stats" class="main-navigation__additional">Stats</a>
+    <a href="#stats" data-menu-type ='${MenuItem.STATISTIC}' class="main-navigation__additional ${currentFilterType === MenuItem.STATISTIC ? 'main-navigation__additional-active' : ''}">Stats</a>
   </nav>`;
 };
 
 export default class FilterView extends AbstractView {
   #currentFilter = null;
   #filters = null;
+  #isActiveSort = false;
 
   constructor(filters, currentFilter) {
     super();
     this.#currentFilter = currentFilter;
     this.#filters = filters;
+    this.element.addEventListener('click', this.#filterTypeChangeHandler);
   }
 
   get template() {
@@ -40,11 +43,36 @@ export default class FilterView extends AbstractView {
   };
 
   #filterTypeChangeHandler = (evt) => {
-    if(evt.target.tagName !== 'A'){
+    if (evt.target.tagName !== 'A') {
       return;
     }
     evt.preventDefault();
-    this._callback.filterTypeChange(evt.target.id);
+    if (evt.target.dataset.menuType === MenuItem.STATISTIC) {
+      this.#isActiveSort = true;
+      this._callback.menuClick(evt.target.dataset.menuType);
+    } else {
+      this._callback.menuClick(evt.target.dataset.menuType);
+      this._callback.filterTypeChange(evt.target.id);
+    }
+    /*if (evt.target.dataset.menuType === MenuItem.STATISTIC) {
+      this.#isActiveSort = true;
+      this._callback.menuClick(evt.target.dataset.menuType);
+      return;
+    }
+    if(this.#isActiveSort && evt.target.dataset.menuType === MenuItem.MOVIES){
+      this._callback.menuClick(evt.target.dataset.menuType);
+      this._callback.filterTypeChange();
+      this.#isActiveSort = false;
+      return;
+    }
+    if(!this.#isActiveSort && evt.target.dataset.menuType === MenuItem.MOVIES){
+      this._callback.filterTypeChange(evt.target.id);
+    }*/
+  };
+
+  setStatisticsClickHandler = (callback) => {
+    this._callback.menuClick = callback;
+
   };
 }
 
