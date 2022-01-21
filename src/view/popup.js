@@ -213,6 +213,7 @@ export default class PopupView extends SmartView {
         emotion: emoji,
       };
       this._callback.submitComment(newComment);
+
     }
   };
 
