@@ -181,7 +181,7 @@ export default class StatisticView extends SmartView {
 
   #periodTimeChange = (value) => {
     const now = dayjs(dayjs().format());
-    let convertedData;
+    let newData;
     let timeChange;
     let convertedTime;
     switch (value) {
@@ -189,35 +189,35 @@ export default class StatisticView extends SmartView {
         return this._data;
       case 'today' : {
         timeChange = 0;
-        convertedData = this._data.slice().filter((movie) => {
+        newData = this._data.slice().filter((movie) => {
           convertedTime = dayjs(movie.watchingTime).format();
           return now.diff(convertedTime, 'day') === timeChange;
         });
-        return convertedData;
+        return newData;
       }
       case 'week' : {
         timeChange = 7;
-        convertedData = this._data.slice().filter((movie) => {
+        newData = this._data.slice().filter((movie) => {
           convertedTime = dayjs(movie.watchingTime).format();
           return Number(now.diff(convertedTime, 'day')) <= timeChange;
         });
-        return convertedData;
+        return newData;
       }
       case 'month' : {
         timeChange = 30;
-        convertedData = this._data.slice().filter((movie) => {
+        newData = this._data.slice().filter((movie) => {
           convertedTime = dayjs(movie.watchingTime).format();
           return Number(now.diff(convertedTime, 'day')) <= timeChange;
         });
-        return convertedData;
+        return newData;
       }
       case 'year' : {
         timeChange = 365;
-        convertedData = this._data.slice().filter((movie) => {
+        newData = this._data.slice().filter((movie) => {
           convertedTime = dayjs(movie.watchingTime).format();
           return Number(now.diff(convertedTime, 'day')) <= timeChange;
         });
-        return convertedData;
+        return newData;
       }
     }
   };
