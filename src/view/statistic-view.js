@@ -2,6 +2,7 @@ import SmartView from './smart-view.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import dayjs from 'dayjs';
+import {replace} from '../utils/render.js';
 
 const createStatisticsTemplate = () => (
   `<section class="statistic">
@@ -157,8 +158,10 @@ export default class StatisticView extends SmartView {
       if (evt.target.tagName !== 'INPUT'||evt.target.value === this.currentPeriod){
         return;
       }
+      const prevMovieChart = this.#movieChart;
       this.currentPeriod = evt.target.value;
-      this.updateElement();
+      this.#setChart();
+      replace(this.#movieChart, prevMovieChart);
     });
   }
 
