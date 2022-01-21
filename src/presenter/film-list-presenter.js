@@ -9,7 +9,7 @@ import EmptyView from '../view/empty-view';
 
 export default class FilmListPresenter {
   #moviesModel = null;
-  #topRated = new TopRatedTemplateView();
+  #topRated = null;
   #showMoreButton = new ShowMoreButtonView();
   #sortList = new SortListView();
   #mainSheme = new MainSheme();
@@ -30,7 +30,7 @@ export default class FilmListPresenter {
 
   get movies() {
     this.#filterType = this.#filterModel.filter;
-    const movies = this.#moviesModel.movies;
+    const movies = [...this.#moviesModel.movies];
     const filteredMovies = filter[this.#filterType](movies);
 
     switch (this._currentSortType) {
@@ -39,7 +39,7 @@ export default class FilmListPresenter {
       case SortTypes.RATING:
         return filteredMovies.sort(sortByRating);
     }
-    return filteredMovies;
+    return filter[this.#filterType](this.#moviesModel.movies);
   }
 
   init = () => {
@@ -53,6 +53,14 @@ export default class FilmListPresenter {
   #handleViewAction = (updateType, update) => {
     this.#moviesModel.updateMovie(updateType, update);
   };
+
+  destroy(){
+    this.#clearMoviesList({resetRenderedMoviesCount:true, resetSortType:true});
+    remove(this.#mainSheme);
+    remove(this.#topRated);
+    this.#moviesModel.removeObserver(this.#handleModelEvent);
+    this.#filterModel.removeObserver(this.#handleModelEvent);
+  }
 
   #renderNoMovies = () => {
     this.#noMoviesComponent = new EmptyView(this.#filterType);
@@ -77,8 +85,9 @@ export default class FilmListPresenter {
 
   #renderPageElements = () => {
     this.#renderSortView();
+    this.#topRated = new TopRatedTemplateView(this.movies);
     render(this.#mainContainer, this.#mainSheme.element, RenderPosition.BEFOREEND);
-    render(this.#mainContainer, this.#topRated.element, RenderPosition.BEFOREEND);
+    render(this.#mainContainer, this.#topRated.element, RenderPosition.AFTEREND);
   };
 
   #renderFilmCards = () => {

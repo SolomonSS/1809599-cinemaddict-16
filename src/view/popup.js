@@ -154,6 +154,10 @@ export default class PopupView extends SmartView {
     return popupTemplate(this._data);
   }
 
+  reset = (data) => {
+    this.updateData({...data});
+  };
+
   restoreHandlers = () => {
     this.#setInnerHandlers();
   };
@@ -184,34 +188,42 @@ export default class PopupView extends SmartView {
   setDeleteCommentButtonClickHandler = (callback) => {
     this._callback.deleteCommentClick = callback;
     const buttons = this.element.querySelectorAll('.film-details__comment-delete');
-    if(buttons){
-      buttons.forEach((button) => {button.addEventListener('click', this.#deleteCommentClick);});
+    if (buttons) {
+      buttons.forEach((button) => {
+        button.addEventListener('click', this.#deleteCommentClick);
+      });
     }
-  }
+  };
 
-  setSubmitFormClickHandler = (callback) =>{
+  setSubmitFormClickHandler = (callback) => {
     this._callback.submitComment = callback;
     document.addEventListener('keydown', this.#submitFormKeyDown);
-  }
+  };
 
   #submitFormKeyDown = (evt) => {
-    if(evt.key === 'Enter' && evt.key === 'Control' && evt.which === 13 && evt.which === 17){//Условие не срабатывает
+    if ((evt.ctrlKey || evt.metaKey) && evt.key === 'Enter') {
+      const commentInput = this.element.querySelector('.film-details__comment-input').value;
+      const emoji = this.element.querySelector('.comment-emoji').src;
+      if (!commentInput || !emoji) {
+        return;
+      }
       const newComment = {
         id: nanoid(),
-        commentText: he.encode(this.element.querySelector('.film-details__comment-input').value),
-        emotion: this.element.querySelector('.comment-emoji').src,
+        commentText: he.encode(commentInput),
+        emotion: emoji,
       };
       this._callback.submitComment(newComment);
+
     }
-  }
+  };
 
   #deleteCommentClick = (evt) => {
-    if(evt.target.tagName !== 'BUTTON'){
+    if (evt.target.tagName !== 'BUTTON') {
       return;
     }
     evt.preventDefault();
     this._callback.deleteCommentClick(evt.target.id);
-  }
+  };
 
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();

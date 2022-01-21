@@ -30,15 +30,16 @@ export default class FilmPresenter {
     this.#filmCard = new FilmCardView(this.#film);
     this.#popup = new PopupView(this.#film);
 
-    this.#filmCard.setFilmCardClickHandler(this.#addPopup);
+    this.#filmCard.setFilmCardClickHandler(this.#handleOpenPopupClick);
     this.#filmCard.setIsFavoriteClickHandler(this.#handleIsAddedToFavorite);
     this.#filmCard.setIsWatchedClickHandler(this.#handleIsWatched);
     this.#filmCard.setIsAddedToWatchListClickHandler(this.#handleIsAddedToWatchList);
-    this.#popup.setCloseButtonHandler(this.#removePopup);
+    this.#popup.setCloseButtonHandler(this.#handleClosePopupClick);
     this.#popup.setFavoriteClickHandler(this.#handleIsAddedToFavorite);
     this.#popup.setWatchedClickHandler(this.#handleIsWatched);
     this.#popup.setWatchingListClickHandler(this.#handleIsAddedToWatchList);
     this.#popup.setDeleteCommentButtonClickHandler(this.#handleDeleteCommentClick);
+    this.#popup.setSubmitFormClickHandler(this.#handleSubmitComment);
 
     if (prevFilmComponent === null || prevPopupComponent === null) {
       render(this.#filmsContainer, this.#filmCard.element, RenderPosition.BEFOREEND);
@@ -58,24 +59,33 @@ export default class FilmPresenter {
   };
 
   resetView = () => {
-    this.#filmCard.reset(this.#film);
+    if(this.#mode !== Mode.DEFAULT){
+      this.#removePopup();
+    }
   };
 
   #addPopup = () => {
-    replace(this.#popup, this.#filmCard);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
-    this.#popup.setSubmitFormClickHandler(this.#handleSubmitComment);
+    this.#changeMode();
+    document.body.appendChild(this.#popup.element);
     this.#mode = Mode.EDITING;
   };
 
   #removePopup = () => {
-    replace(this.#filmCard, this.#popup);
+    if(document.body.contains(this.#popup.element)){
+      document.body.removeChild(this.#popup.element);
+    }
     document.removeEventListener('keydown', this.#escKeyDownHandler);
-    this.#mode = Mode.DEFAULT;
-    this.#changeData(
-      UpdateType.MINOR,
-      {...this.#film});
   };
+
+  #handleClosePopupClick = () =>{
+    this.#removePopup();
+    this.#mode = Mode.DEFAULT;
+  }
+
+  #handleOpenPopupClick = () => {
+    this.#addPopup();
+    document.addEventListener('keydown', this.#escKeyDownHandler);
+  }
 
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
@@ -115,7 +125,7 @@ export default class FilmPresenter {
   };
 
   #handleSubmitComment = (newComment) => {
-    this.#film.comments = this.#film.comments.push(newComment);
+    this.#film.comments = [...this.#film.comments ,newComment];
     this.#changeData(
       UpdateType.PATCH,
       {...this.#film});
