@@ -154,6 +154,10 @@ export default class PopupView extends SmartView {
     return popupTemplate(this._data);
   }
 
+  reset = (data) => {
+    this.updateData({...data});
+  };
+
   restoreHandlers = () => {
     this.#setInnerHandlers();
   };
@@ -209,7 +213,6 @@ export default class PopupView extends SmartView {
         emotion: emoji,
       };
       this._callback.submitComment(newComment);
-
     }
   };
 

@@ -87,6 +87,7 @@ const generateFilmCard = () => {
     isWatched: Boolean(getRandomInteger()),
     isAddedToFavorite: Boolean(getRandomInteger()),
     commentEmoji: '',
+    watchingTime: dayjs(`${getRandomInteger(realiseDate, 2021)}-${getRandomInteger(1, 12)}-${getRandomInteger(0,30)}`).format('DD MMMM YYYY'),
   };
 };
 

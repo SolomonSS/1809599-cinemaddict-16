@@ -1,6 +1,7 @@
 import SmartView from './smart-view.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import dayjs from 'dayjs';
 
 const createStatisticsTemplate = () => (
   `<section class="statistic">
@@ -49,17 +50,31 @@ const createStatisticsTemplate = () => (
 
   </section>`);
 
-const makeItemsUniq = (items) => [...new Set(items)];
+const makeItemsUniq = (genresEachMovie) => {
+  const genresList = new Set();
+  genresEachMovie.forEach((movie) =>
+    movie.forEach((genre) => genresList.add(genre)));
+  return genresList;
+};
 
-const countMoviesByGenre = (movies, genre) =>
-  movies.filter((movie) => movie.genres === genre).length;
-
-const renderChart = (statisticCtx, movies) =>{
-  //const BAR_HEIGHT = 50;
-  const genresCountList = movies.map((movie)=>movie.genres);
-  const uniqGenres = makeItemsUniq(genresCountList);
-  const movieByGenreCounts = uniqGenres.map((genre) => countMoviesByGenre(movies, genre));
-  //statisticCtx.height = BAR_HEIGHT * Number(uniqGenres.size);
+const countMoviesByGenre = (movies, genres) => {
+  const moviesPerGenre = [];
+  genres.forEach(() => moviesPerGenre.push(0));
+  for (let i = 0; i < genres.length; i++) {
+    movies.forEach((movie) => {
+      if (movie.includes(genres[i])) {
+        moviesPerGenre[i] += 1;
+      }
+    });
+  }
+  return moviesPerGenre;
+};
+const renderChart = (statisticCtx, movies) => {
+  const BAR_HEIGHT = 50;
+  const genresCountList = movies.map((movie) => movie.genres);
+  const uniqGenres = Array.from(makeItemsUniq(genresCountList));
+  const movieByGenreCounts = countMoviesByGenre(genresCountList, uniqGenres);
+  statisticCtx.height = BAR_HEIGHT * uniqGenres.length;
   return new Chart(statisticCtx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
@@ -119,37 +134,91 @@ const renderChart = (statisticCtx, movies) =>{
   });
 };
 
-export default class StatisticView extends SmartView{
+export default class StatisticView extends SmartView {
   _data;
   #movieChart = null;
+  currentPeriod = 'all-time';
 
   constructor(movies) {
     super();
 
     this._data = [...movies];
 
-    this.#setCharts();
+    this.#setChart(this._data);
+    this.restoreHandlers();
   }
 
   get template() {
     return createStatisticsTemplate(this._data);
   }
 
-  removeElement = () => {
-    super.removeElement();
+  periodChangeHandler = () => {
+    this.element.querySelector('.statistic__filters').addEventListener('change', (evt) => {
+      if (evt.target.tagName !== 'INPUT'||evt.target.value === this.currentPeriod){
+        return;
+      }
+      this.currentPeriod = evt.target.value;
+      this.updateElement();
+    });
   }
 
+  removeElement() {
+    super.removeElement();
+    if(this.#movieChart){
+      this.#movieChart.destroy();
+      this.#movieChart = null;
+    }
+  }
 
   restoreHandlers = () => {
-    this.#setCharts();
-    this.#setDatepicker();
-  }
+    this.periodChangeHandler();
+  };
 
-  #setDatepicker = () => {
-  }
+  #setChart = () => {
+    const statisticCtx = this.element.querySelector('.statistic__chart');
+    this.#movieChart = renderChart(statisticCtx, this.#periodTimeChange(this.currentPeriod));
+  };
 
-  #setCharts = () => {
-    const statisticCtx = document.querySelector('.statistic__chart');
-    this.#movieChart = renderChart(statisticCtx ,this._data);
-  }
+  #periodTimeChange = (value) => {
+    const now = dayjs(dayjs().format());
+    let convertedData;
+    let timeChange;
+    let convertedTime;
+    switch (value) {
+      case 'all-time' :
+        return this._data;
+      case 'today' : {
+        timeChange = 0;
+        convertedData = this._data.slice().filter((movie) => {
+          convertedTime = dayjs(movie.watchingTime).format();
+          return now.diff(convertedTime, 'day') === timeChange;
+        });
+        return convertedData;
+      }
+      case 'week' : {
+        timeChange = 7;
+        convertedData = this._data.slice().filter((movie) => {
+          convertedTime = dayjs(movie.watchingTime).format();
+          return Number(now.diff(convertedTime, 'day')) <= timeChange;
+        });
+        return convertedData;
+      }
+      case 'month' : {
+        timeChange = 30;
+        convertedData = this._data.slice().filter((movie) => {
+          convertedTime = dayjs(movie.watchingTime).format();
+          return Number(now.diff(convertedTime, 'day')) <= timeChange;
+        });
+        return convertedData;
+      }
+      case 'year' : {
+        timeChange = 365;
+        convertedData = this._data.slice().filter((movie) => {
+          convertedTime = dayjs(movie.watchingTime).format();
+          return Number(now.diff(convertedTime, 'day')) <= timeChange;
+        });
+        return convertedData;
+      }
+    }
+  };
 }

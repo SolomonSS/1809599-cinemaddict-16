@@ -125,7 +125,7 @@ export default class FilmPresenter {
   };
 
   #handleSubmitComment = (newComment) => {
-    this.#film.comments = this.#film.comments.push(newComment);
+    this.#film.comments = [...this.#film.comments ,newComment];
     this.#changeData(
       UpdateType.PATCH,
       {...this.#film});
