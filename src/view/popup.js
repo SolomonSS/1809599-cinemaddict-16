@@ -10,7 +10,7 @@ const renderGenres = (genres) => {
   return genresList;
 };
 
-const renderComments = (comments) => {
+/*const renderComments = (comments) => {
   let commentsList = '';
   for (const comment of comments) {
     commentsList += `<li class="film-details__comment">
@@ -29,6 +29,7 @@ const renderComments = (comments) => {
   }
   return commentsList;
 };
+${renderComments(popup.comments)}*/
 
 const popupTemplate = (popup) =>
   `<section class="film-details">
@@ -105,7 +106,7 @@ const popupTemplate = (popup) =>
         <h3 class="film-details__comments-title">Comments<span class="film-details__comments-count">${popup.comments.length}</span></h3>
 
         <ul class="film-details__comments-list"></ul>
-            ${renderComments(popup.comments)}
+
         <div class="film-details__new-comment">
           <div class="film-details__add-emoji-label">
           <span class="film-details__comment-emoji"><img class="comment-emoji" src="${popup.commentEmoji}" width="55" height="55" alt=""></span>

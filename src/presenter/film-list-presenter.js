@@ -5,7 +5,8 @@ import MainSheme from '../view/main-sheme.js';
 import {remove, render, RenderPosition, sortByDate, sortByRating} from '../utils/render.js';
 import FilmPresenter from './film-presenter.js';
 import {FILM_COUNT_PER_CLICK, filter, FilterTypes, UpdateType} from '../const.js';
-import EmptyView from '../view/empty-view';
+import EmptyView from '../view/empty-view.js';
+import LoadingView from '../view/loading-view.js';
 
 export default class FilmListPresenter {
   #moviesModel = null;
@@ -13,6 +14,7 @@ export default class FilmListPresenter {
   #showMoreButton = new ShowMoreButtonView();
   #sortList = new SortListView();
   #mainSheme = new MainSheme();
+  #loadingComponent = new LoadingView();
   #renderedFilmsCount = FILM_COUNT_PER_CLICK;
   #mainContainer;
   #filmPresenter = new Map();
@@ -21,6 +23,7 @@ export default class FilmListPresenter {
   #filterModel = null;
   #filterType = FilterTypes.ALL;
   #noMoviesComponent = null;
+  #isLoading = true;
 
   constructor(main, moviesModel, filtersModel) {
     this.#mainContainer = main;
@@ -67,6 +70,10 @@ export default class FilmListPresenter {
     render(this.#mainContainer, this.#noMoviesComponent.element, RenderPosition.BEFOREEND);
   }
 
+  #renderLoading = () => {
+    render(this.#mainContainer, this.#loadingComponent.element, RenderPosition.AFTERBEGIN);
+  }
+
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
@@ -80,6 +87,12 @@ export default class FilmListPresenter {
         this.#clearMoviesList({resetRenderedMoviesCount: true, resetSortType: true});
         this.#renderFilmCards();
         break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#clearMoviesList({resetRenderedMoviesCount:true, resetSortType:true});
+        this.#renderFilmCards();
+        break;
     }
   };
 
@@ -91,6 +104,10 @@ export default class FilmListPresenter {
   };
 
   #renderFilmCards = () => {
+    if(this.#isLoading){
+      this.#renderLoading();
+      return;
+    }
     const moviesCount = this.movies.length;
     const movies = this.movies.slice(0, Math.min(moviesCount, FILM_COUNT_PER_CLICK));
     if(moviesCount === 0){
@@ -157,6 +174,7 @@ export default class FilmListPresenter {
     this.#filmPresenter.forEach((presenter) => presenter.destroy());
     this.#filmPresenter.clear();
     this.#buttonRemove();
+    remove(this.#loadingComponent);
     if (resetRenderedMoviesCount) {
       this.#renderedFilmsCount = FILM_COUNT_PER_CLICK;
     } else {
