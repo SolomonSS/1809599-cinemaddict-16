@@ -10,11 +10,9 @@ import StatisticView from './view/statistic-view.js';
 import ApiService from './api-service.js';
 
 const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
-const AUTHORIZATION = 'Basic jasndfas98as';
+const AUTHORIZATION = 'Basic jasndfas98';
 
 const moviesModel = new MoviesModel(new ApiService(END_POINT, AUTHORIZATION));
-//moviesModel.movies = films;
-moviesModel.init();
 
 const pageHeader = document.querySelector('.header');
 const pageMain = document.querySelector('.main');
@@ -48,7 +46,9 @@ const handleSiteMenuClick = (menuItem) =>{
   }
 };
 
-filterPresenter.setMenuStatisticClickHandler(handleSiteMenuClick);
-filterPresenter.init();
+moviesModel.init().finally(()=>{
+  filterPresenter.setMenuStatisticClickHandler(handleSiteMenuClick);
+  filterPresenter.init();
+});
 filmListPresenter.init();
 

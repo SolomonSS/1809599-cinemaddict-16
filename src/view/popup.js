@@ -1,6 +1,9 @@
 import SmartView from './smart-view.js';
 import {nanoid} from 'nanoid';
 import he from 'he';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+dayjs.extend(duration);
 
 const renderGenres = (genres) => {
   let genresList = '';
@@ -71,11 +74,11 @@ const popupTemplate = (popup) =>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
-              <td class="film-details__cell">${popup.realiseFullDate}</td>
+              <td class="film-details__cell">${dayjs(popup.realiseFullDate).format('D MMM YYYY')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">${popup.filmDuration}</td>
+              <td class="film-details__cell">${dayjs.duration(popup.filmDuration, 'minutes').format('H[h] mm[m]')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Country</td>

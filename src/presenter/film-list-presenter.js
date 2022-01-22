@@ -33,7 +33,7 @@ export default class FilmListPresenter {
 
   get movies() {
     this.#filterType = this.#filterModel.filter;
-    const movies = [...this.#moviesModel.movies];
+    const movies = this.#moviesModel.movies;
     const filteredMovies = filter[this.#filterType](movies);
 
     switch (this._currentSortType) {
@@ -48,9 +48,9 @@ export default class FilmListPresenter {
   init = () => {
     this.#renderPageElements();
     this.#filmsListContainer = document.querySelector('.films-list__container');
+    this.#renderFilmCards();
     this.#moviesModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
-    this.#renderFilmCards();
   };
 
   #handleViewAction = (updateType, update) => {
@@ -71,7 +71,7 @@ export default class FilmListPresenter {
   }
 
   #renderLoading = () => {
-    render(this.#mainContainer, this.#loadingComponent.element, RenderPosition.AFTERBEGIN);
+    render(this.#mainContainer, this.#loadingComponent.element, RenderPosition.BEFOREEND);
   }
 
   #handleModelEvent = (updateType, data) => {
@@ -90,7 +90,6 @@ export default class FilmListPresenter {
       case UpdateType.INIT:
         this.#isLoading = false;
         remove(this.#loadingComponent);
-        this.#clearMoviesList({resetRenderedMoviesCount:true, resetSortType:true});
         this.#renderFilmCards();
         break;
     }
@@ -98,9 +97,7 @@ export default class FilmListPresenter {
 
   #renderPageElements = () => {
     this.#renderSortView();
-    this.#topRated = new TopRatedTemplateView(this.movies);
     render(this.#mainContainer, this.#mainSheme.element, RenderPosition.BEFOREEND);
-    render(this.#mainContainer, this.#topRated.element, RenderPosition.AFTEREND);
   };
 
   #renderFilmCards = () => {
@@ -137,6 +134,10 @@ export default class FilmListPresenter {
 
     if (this.#renderedFilmsCount >= moviesCount) {
       remove(this.#showMoreButton);
+    }
+    if(this.#topRated === null) {
+      this.#topRated = new TopRatedTemplateView(this.movies);
+      render(this.#mainContainer, this.#topRated.element, RenderPosition.AFTEREND);
     }
   };
 

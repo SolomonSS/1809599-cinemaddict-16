@@ -19,9 +19,9 @@ export default class ApiService {
 
   updateMovie = async (movie) => {
     const response = await this.#load({
-      url: `tasks/${movie.id}`,
+      url: `movies/:${movie.id}`,
       method: Method.PUT,
-      body: JSON.stringify(movie),
+      body: JSON.stringify(this.#adaptToServer(movie)),
       headers: new Headers({'Content-Type': 'application/json'}),
     });
 
@@ -53,7 +53,36 @@ export default class ApiService {
 
   static parseResponse = (response) => response.json();
 
-  #adaptMoviesToService = () =>{}
+  #adaptToServer = (movie) => {
+    const adaptedMovie = {
+      id: movie.id,
+      comments: movie.comments,
+      film_info: {
+        alternative_title: movie.originalFilmName,
+        poster: movie.poster,
+        description: movie.fullDescription,
+        director: movie.director,
+        title: movie.filmName,
+        writers: [...movie.writers],
+        actors: [...movie.actors],
+        total_rating: movie.rating,
+        release: {
+          date: movie.realise,
+          release_country: movie.country,
+        },
+        runtime: movie.duration,
+        genre: [...movie.genres],
+        age_rating: movie.censored,
+      },
+      user_details: {
+        watchlist: movie.isAddedToWatchList,
+        favorite: movie.isAddedToFavorite,
+        already_watched: movie.isWatched,
+        watching_date: movie.watchingTime,
+      }
+    };
+    return adaptedMovie;
+  };
 
   static checkStatus = (response) => {
     if (!response.ok) {

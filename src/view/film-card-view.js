@@ -1,13 +1,16 @@
 import SmartView from './smart-view.js';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+dayjs.extend(duration);
 
 const createFilmCardTemplate = (film) => `<article class="film-card">
           <a class="film-card__link">
             <h3 class="film-card__title">${film.filmName}</h3>
             <p class="film-card__rating">${film.rating}</p>
             <p class="film-card__info">
-              <span class="film-card__year">${film.realise}</span>
-              <span class="film-card__duration">${film.filmDuration}</span>
-              <span class="film-card__genre">${film.genres}</span>
+              <span class="film-card__year">${dayjs(film.realise).format('YYYY')}</span>
+              <span class="film-card__duration">${dayjs.duration(film.filmDuration, 'minutes').format('H[h] mm[m]')}</span>
+              <span class="film-card__genre">${film.genres.length<3? film.genres : film.genres[0], film.genres[1]}</span>
             </p>
             <img src="${film.poster}" alt="Photo" class="film-card__poster">
             <p class="film-card__description">${film.description}</p>

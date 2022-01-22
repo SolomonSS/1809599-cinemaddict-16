@@ -1,5 +1,6 @@
 import AbstractObservable from '../utils/abstract-observable.js';
 import {UpdateType} from '../const.js';
+import {getShortDescription} from '../utils/render.js';
 
 
 export default class MoviesModel extends AbstractObservable {
@@ -32,7 +33,7 @@ export default class MoviesModel extends AbstractObservable {
       originalFilmName: movie.film_info.alternative_title,
       poster: `${movie.film_info.poster}`,
       fullDescription: movie.film_info.description,
-      description: movie.film_info.description,
+      description: getShortDescription(movie.film_info.description),
       director: movie.film_info.director,
       writers: movie.film_info.writers,
       actors: movie.film_info.actors,
@@ -54,19 +55,25 @@ export default class MoviesModel extends AbstractObservable {
     return adaptedMovie;
   };
 
-  updateMovie = (updateType, update) => {
+  updateMovie = async (updateType, update) => {
     const index = this.#movies.findIndex((movie) => movie.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\'t update unexisting task');
     }
+    try {
+      const response = await this.#apiService.updateMovie(update);
+      const updatedMovie = this.#adaptToClient(response);
 
-    this.#movies = [
-      ...this.#movies.slice(0, index),
-      update,
-      ...this.#movies.slice(index + 1),
-    ];
+      this.#movies = [
+        ...this.#movies.slice(0, index),
+        updatedMovie,
+        ...this.#movies.slice(index + 1),
+      ];
 
-    this._notify(updateType, update);
+      this._notify(updateType, update);
+    } catch (err){
+      throw new Error('Can\'t update movie');
+    }
   };
 }
