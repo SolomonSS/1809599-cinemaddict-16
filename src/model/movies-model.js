@@ -1,6 +1,7 @@
 import AbstractObservable from '../utils/abstract-observable.js';
 import {UpdateType} from '../const.js';
 import {getShortDescription} from '../utils/render.js';
+import PopupView from '../view/popup';
 
 
 export default class MoviesModel extends AbstractObservable {
@@ -26,6 +27,11 @@ export default class MoviesModel extends AbstractObservable {
     return this.#movies;
   }
 
+  getCommentsById = (movie) => {
+    this.#apiService.getComments(movie).then((result)=>PopupView.parseComments(result));
+  };
+
+
   #adaptToClient = (movie) => {
     const adaptedMovie = {
       ...movie,
@@ -44,7 +50,8 @@ export default class MoviesModel extends AbstractObservable {
       genres: movie.film_info.genre,
       country: movie.film_info.release.release_country,
       censored: movie.film_info.age_rating,
-      comments: movie.comments,
+      comments: movie.id,
+      commentsId: movie.comments,
       isAddedToWatchList: movie.user_details.watchlist,
       isWatched: movie.user_details.already_watched,
       isAddedToFavorite: movie.user_details.favorite,
@@ -55,14 +62,42 @@ export default class MoviesModel extends AbstractObservable {
     return adaptedMovie;
   };
 
+  static adaptToServer = (movie) => ({
+    id: movie.id,
+    comments: movie.comments,
+    film_info: {
+      alternative_title: movie.originalFilmName,
+      poster: movie.poster,
+      description: movie.fullDescription,
+      director: movie.director,
+      title: movie.filmName,
+      writers: [...movie.writers],
+      actors: [...movie.actors],
+      total_rating: movie.rating,
+      release: {
+        date: movie.realise,
+        release_country: movie.country,
+      },
+      runtime: movie.duration,
+      genre: [...movie.genres],
+      age_rating: movie.censored,
+    },
+    user_details: {
+      watchlist: movie.isAddedToWatchList,
+      favorite: movie.isAddedToFavorite,
+      already_watched: movie.isWatched,
+      watching_date: movie.watchingTime,
+    }
+  });
+
   updateMovie = async (updateType, update) => {
     const index = this.#movies.findIndex((movie) => movie.id === update.id);
 
     if (index === -1) {
-      throw new Error('Can\'t update unexisting task');
+      throw new Error('Can\'t update unexisting movie');
     }
     try {
-      const response = await this.#apiService.updateMovie(update);
+      const response = await this.#apiService.updateMovie(MoviesModel.adaptToServer(update));
       const updatedMovie = this.#adaptToClient(response);
 
       this.#movies = [
@@ -72,7 +107,7 @@ export default class MoviesModel extends AbstractObservable {
       ];
 
       this._notify(updateType, update);
-    } catch (err){
+    } catch (err) {
       throw new Error('Can\'t update movie');
     }
   };

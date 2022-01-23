@@ -21,8 +21,7 @@ const createFilmCardTemplate = (film) => `<article class="film-card">
             <button class="film-card__controls-item film-card__controls-item--mark-as-watched ${film.isWatched ? 'film-card__controls-item--active' : ''}" type="button">Mark as watched</button>
             <button class="film-card__controls-item film-card__controls-item--favorite ${film.isAddedToFavorite ? 'film-card__controls-item--active' : ''}" type="button">Mark as favorite</button>
           </div>
-   </article>
-`;
+   </article>`;
 
 export default class FilmCardView extends SmartView {
 

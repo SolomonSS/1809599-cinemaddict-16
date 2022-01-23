@@ -157,7 +157,7 @@ export default class FilmListPresenter {
   };
 
   #renderFilmCard = (card) => {
-    const filmPresenter = new FilmPresenter(this.#filmsListContainer, this.#handleViewAction, this.#handleModeChange);
+    const filmPresenter = new FilmPresenter(this.#filmsListContainer, this.#handleViewAction, this.#handleModeChange, this.#moviesModel.getCommentsById);
     filmPresenter.init(card);
     this.#filmPresenter.set(card.id, filmPresenter);
   };

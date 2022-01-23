@@ -16,11 +16,13 @@ export default class FilmPresenter {
   #changeData = null;
   #changeMode = null;
   #mode = Mode.DEFAULT;
+  #comments;
 
-  constructor(container, changeData, changeMode) {
+  constructor(container, changeData, changeMode,comments) {
     this.#filmsContainer = container;
     this.#changeData = changeData;
     this.#changeMode = changeMode;
+    this.#comments = comments;
   }
 
   init = (film) => {
@@ -83,6 +85,7 @@ export default class FilmPresenter {
   }
 
   #handleOpenPopupClick = () => {
+    this.#comments(this.#film);
     this.#addPopup();
     document.addEventListener('keydown', this.#escKeyDownHandler);
   }

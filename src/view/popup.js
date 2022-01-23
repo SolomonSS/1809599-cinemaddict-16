@@ -3,6 +3,8 @@ import {nanoid} from 'nanoid';
 import he from 'he';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
+dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
 const renderGenres = (genres) => {
@@ -13,18 +15,18 @@ const renderGenres = (genres) => {
   return genresList;
 };
 
-/*const renderComments = (comments) => {
+const renderComments = (comments) => {
   let commentsList = '';
   for (const comment of comments) {
     commentsList += `<li class="film-details__comment">
             <span class="film-details__comment-emoji">
-              <img src="${comment.emotion}" width="55" height="55" alt="emoji-${comment.emotion.name}">
+              <img src="images/emoji/${comment.emotion}.jpg" width="55" height="55" alt="emoji-${comment.emotion}">
             </span>
             <div>
-              <p class="film-details__comment-text">${comment.commentText}</p>
+              <p class="film-details__comment-text">${comment.comment}</p>
               <p class="film-details__comment-info">
-                <span class="film-details__comment-author">${comment.authorName ? comment.authorName : ''}</span>
-                <span class="film-details__comment-day">${comment.commentDate ? comment.commentDate : ''}</span>
+                <span class="film-details__comment-author">${comment.author ? comment.author : ''}</span>
+                <span class="film-details__comment-day">${comment.date ? dayjs(comment.date).fromNow() : ''}</span>
                 <button id="${comment.id}" class="film-details__comment-delete">Delete</button>
               </p>
             </div>
@@ -32,9 +34,8 @@ const renderGenres = (genres) => {
   }
   return commentsList;
 };
-${renderComments(popup.comments)}*/
 
-const popupTemplate = (popup) =>
+const popupTemplate = (popup, comments) =>
   `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
         <div class="film-details__top-container">
@@ -106,13 +107,14 @@ const popupTemplate = (popup) =>
 
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">Comments<span class="film-details__comments-count">${popup.comments.length}</span></h3>
+        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${ popup.comments.length}</span></h3>
 
-        <ul class="film-details__comments-list"></ul>
+        <ul class="film-details__comments-list"> ${comments ? renderComments(comments): ''}
+        </ul>
 
         <div class="film-details__new-comment">
           <div class="film-details__add-emoji-label">
-          <span class="film-details__comment-emoji"><img class="comment-emoji" src="${popup.commentEmoji}" width="55" height="55" alt=""></span>
+          <span class="film-details__comment-emoji"><img class="comment-emoji" src="" width="55" height="55" alt=""></span>
           </div>
 
           <label class="film-details__comment-label">
@@ -147,7 +149,7 @@ const popupTemplate = (popup) =>
   </section>`;
 
 export default class PopupView extends SmartView {
-
+  #comments;
   constructor(film) {
     super();
     this._data = film;
@@ -155,7 +157,7 @@ export default class PopupView extends SmartView {
   }
 
   get template() {
-    return popupTemplate(this._data);
+    return popupTemplate(this._data, this.#comments);
   }
 
   reset = (data) => {
@@ -165,6 +167,10 @@ export default class PopupView extends SmartView {
   restoreHandlers = () => {
     this.#setInnerHandlers();
   };
+
+  static parseComments = (comments) =>{
+    this.#comments = comments;
+  }
 
   #setInnerHandlers = () => {
     this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#emojiHandler);

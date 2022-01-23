@@ -1,6 +1,8 @@
 const Method = {
   GET: 'GET',
   PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
 };
 
 export default class ApiService {
@@ -19,10 +21,41 @@ export default class ApiService {
 
   updateMovie = async (movie) => {
     const response = await this.#load({
-      url: `movies/:${movie.id}`,
+      url: `movies/${movie.id}`,
       method: Method.PUT,
-      body: JSON.stringify(this.#adaptToServer(movie)),
+      body: JSON.stringify(movie),
       headers: new Headers({'Content-Type': 'application/json'}),
+    });
+    const parsedResponse = await ApiService.parseResponse(response);
+    return parsedResponse;
+  }
+
+  getComments = async (movie) => {
+    const response = await this.#load({
+      url: `comments/${movie.id}`,
+      method: Method.GET,
+    }).then((data)=>ApiService.parseResponse(data));
+    return response;
+    //return await ApiService.parseResponse(response);
+  }
+
+  postComment = async (movie, localComment) => {
+    const response = await this.#load({
+      url: `comments/:${movie.id}`,
+      method: Method.POST,
+      body: JSON.stringify(localComment),
+    });
+
+    const parsedResponse = await ApiService.parseResponse(response);
+
+    return parsedResponse;
+  }
+
+  deleteComment = async (commentId) => {
+    const response = await this.#load({
+      url: `comments/:${commentId}`,
+      method: Method.GET,
+      headers: new Headers({'Authorization': this.#authorization}),
     });
 
     const parsedResponse = await ApiService.parseResponse(response);
@@ -52,37 +85,6 @@ export default class ApiService {
   }
 
   static parseResponse = (response) => response.json();
-
-  #adaptToServer = (movie) => {
-    const adaptedMovie = {
-      id: movie.id,
-      comments: movie.comments,
-      film_info: {
-        alternative_title: movie.originalFilmName,
-        poster: movie.poster,
-        description: movie.fullDescription,
-        director: movie.director,
-        title: movie.filmName,
-        writers: [...movie.writers],
-        actors: [...movie.actors],
-        total_rating: movie.rating,
-        release: {
-          date: movie.realise,
-          release_country: movie.country,
-        },
-        runtime: movie.duration,
-        genre: [...movie.genres],
-        age_rating: movie.censored,
-      },
-      user_details: {
-        watchlist: movie.isAddedToWatchList,
-        favorite: movie.isAddedToFavorite,
-        already_watched: movie.isWatched,
-        watching_date: movie.watchingTime,
-      }
-    };
-    return adaptedMovie;
-  };
 
   static checkStatus = (response) => {
     if (!response.ok) {
