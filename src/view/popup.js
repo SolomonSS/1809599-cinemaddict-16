@@ -20,7 +20,7 @@ const renderComments = (comments) => {
   for (const comment of comments) {
     commentsList += `<li class="film-details__comment">
             <span class="film-details__comment-emoji">
-              <img src="images/emoji/${comment.emotion}.jpg" width="55" height="55" alt="emoji-${comment.emotion}">
+              <img src="images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
             </span>
             <div>
               <p class="film-details__comment-text">${comment.comment}</p>
@@ -114,7 +114,7 @@ const popupTemplate = (popup, comments) =>
 
         <div class="film-details__new-comment">
           <div class="film-details__add-emoji-label">
-          <span class="film-details__comment-emoji"><img class="comment-emoji" src="" width="55" height="55" alt=""></span>
+          <span class="film-details__comment-emoji"><img class="comment-emoji" width="55" height="55" alt=""></span>
           </div>
 
           <label class="film-details__comment-label">
@@ -150,9 +150,10 @@ const popupTemplate = (popup, comments) =>
 
 export default class PopupView extends SmartView {
   #comments;
-  constructor(film) {
+  constructor(film, comments) {
     super();
     this._data = film;
+    this.#comments = comments;
     this.#setInnerHandlers();
   }
 
@@ -167,10 +168,6 @@ export default class PopupView extends SmartView {
   restoreHandlers = () => {
     this.#setInnerHandlers();
   };
-
-  static parseComments = (comments) =>{
-    this.#comments = comments;
-  }
 
   #setInnerHandlers = () => {
     this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#emojiHandler);
@@ -261,8 +258,9 @@ export default class PopupView extends SmartView {
   };
 
   #emojiHandler = (evt) => {
-    this.element.querySelector('.comment-emoji').src = evt.target.src;
-    this.updateData({commentEmoji: evt.target.src});
+    const emoji = this.element.querySelector('.comment-emoji');
+    emoji.src = evt.target.src;
+    this.updateData(this._data);
   };
 }
 

@@ -25,9 +25,8 @@ export default class ApiService {
       method: Method.PUT,
       body: JSON.stringify(movie),
       headers: new Headers({'Content-Type': 'application/json'}),
-    });
-    const parsedResponse = await ApiService.parseResponse(response);
-    return parsedResponse;
+    }).then((data)=>ApiService.parseResponse(data));
+    return response;
   }
 
   getComments = async (movie) => {

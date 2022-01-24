@@ -5,7 +5,7 @@ import {UpdateType, UserAction} from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
-  EDITING: 'EDITING'
+  POPUP: 'POPUP'
 };
 
 export default class FilmPresenter {
@@ -18,19 +18,19 @@ export default class FilmPresenter {
   #mode = Mode.DEFAULT;
   #comments;
 
-  constructor(container, changeData, changeMode,comments) {
+  constructor(container, changeData, changeMode) {
     this.#filmsContainer = container;
     this.#changeData = changeData;
     this.#changeMode = changeMode;
-    this.#comments = comments;
   }
 
-  init = (film) => {
+  init = (film, comments = []) => {
     this.#film = film;
+    this.#comments = comments;
     const prevFilmComponent = this.#filmCard;
     const prevPopupComponent = this.#popup;
     this.#filmCard = new FilmCardView(this.#film);
-    this.#popup = new PopupView(this.#film);
+    this.#popup = new PopupView(this.#film, this.#comments);
 
     this.#filmCard.setFilmCardClickHandler(this.#handleOpenPopupClick);
     this.#filmCard.setIsFavoriteClickHandler(this.#handleIsAddedToFavorite);
@@ -52,11 +52,11 @@ export default class FilmPresenter {
       replace(this.#filmCard, prevFilmComponent);
     }
 
-    if (this.#mode === Mode.EDITING) {
+    if (this.#mode === Mode.POPUP) {
       replace(this.#popup, prevPopupComponent);
     }
 
-    remove(prevFilmComponent);
+    remove(prevFilmComponent);// Проблема тут
     remove(prevPopupComponent);
   };
 
@@ -69,22 +69,24 @@ export default class FilmPresenter {
   #addPopup = () => {
     this.#changeData(UserAction.GET_COMMENTS, UpdateType.PATCH, this.#film);
     document.body.appendChild(this.#popup.element);
-    this.#mode = Mode.EDITING;
+    this.#mode = Mode.POPUP;
   };
 
   #removePopup = () => {
     if(document.body.contains(this.#popup.element)){
       document.body.removeChild(this.#popup.element);
+      this.#popup = null;
     }
+    this.#mode = Mode.DEFAULT;
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
   #handleClosePopupClick = () =>{
     this.#removePopup();
-    this.#mode = Mode.DEFAULT;
   }
 
   #handleOpenPopupClick = () => {
+    this.#changeMode();
     this.#addPopup();
     document.addEventListener('keydown', this.#escKeyDownHandler);
   }
@@ -107,20 +109,20 @@ export default class FilmPresenter {
   #handleIsAddedToFavorite = () => {
     this.#changeData(
       UserAction.UPDATE,
-      this.#mode === Mode.EDITING ? UpdateType.PATCH : UpdateType.MINOR,
+      this.#mode === Mode.POPUP ? UpdateType.PATCH : UpdateType.MINOR,
       {...this.#film, isAddedToFavorite: !this.#film.isAddedToFavorite});
   };
 
   #handleIsWatched = () => {
     this.#changeData(
       UserAction.UPDATE,
-      this.#mode === Mode.EDITING ? UpdateType.PATCH : UpdateType.MINOR,
+      this.#mode === Mode.POPUP ? UpdateType.PATCH : UpdateType.MINOR,
       {...this.#film, isWatched: !this.#film.isWatched});
   };
 
   #handleIsAddedToWatchList = () => {
     this.#changeData(UserAction.UPDATE,
-      this.#mode === Mode.EDITING ? UpdateType.PATCH : UpdateType.MINOR,
+      this.#mode === Mode.POPUP ? UpdateType.PATCH : UpdateType.MINOR,
       {...this.#film, isAddedToWatchList: !this.#film.isAddedToWatchList});
   };
 

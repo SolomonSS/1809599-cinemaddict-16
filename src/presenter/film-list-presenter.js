@@ -107,7 +107,7 @@ export default class FilmListPresenter {
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#filmPresenter.get(data.id).init(data);
+        this.#filmPresenter.get(data.id).init(data, this.#moviesModel.comments);
         break;
       case UpdateType.MINOR:
         this.#clearMoviesList();
@@ -146,6 +146,10 @@ export default class FilmListPresenter {
     if (moviesCount > FILM_COUNT_PER_CLICK) {
       this.#renderShowMoreButton();
     }
+    if(this.#topRated === null) {
+      this.#topRated = new TopRatedTemplateView(this.movies);
+      render(this.#mainContainer, this.#topRated.element, RenderPosition.AFTEREND);
+    }
   };
 
   #renderShowMoreButton = () => {
@@ -164,10 +168,6 @@ export default class FilmListPresenter {
 
     if (this.#renderedFilmsCount >= moviesCount) {
       remove(this.#showMoreButton);
-    }
-    if(this.#topRated === null) {
-      this.#topRated = new TopRatedTemplateView(this.movies);
-      render(this.#mainContainer, this.#topRated.element, RenderPosition.AFTEREND);
     }
   };
 
