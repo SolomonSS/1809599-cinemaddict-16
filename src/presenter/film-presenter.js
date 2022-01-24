@@ -1,7 +1,7 @@
 import FilmCardView from '../view/film-card-view.js';
 import {remove, render, RenderPosition, replace} from '../utils/render.js';
 import PopupView from '../view/popup.js';
-import {UpdateType} from '../const.js';
+import {UpdateType, UserAction} from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -67,7 +67,7 @@ export default class FilmPresenter {
   };
 
   #addPopup = () => {
-    this.#changeMode();
+    this.#changeData(UserAction.GET_COMMENTS, UpdateType.PATCH, this.#film);
     document.body.appendChild(this.#popup.element);
     this.#mode = Mode.EDITING;
   };
@@ -85,7 +85,6 @@ export default class FilmPresenter {
   }
 
   #handleOpenPopupClick = () => {
-    this.#comments(this.#film);
     this.#addPopup();
     document.addEventListener('keydown', this.#escKeyDownHandler);
   }
@@ -98,40 +97,39 @@ export default class FilmPresenter {
   };
 
   #handleDeleteCommentClick = (commentId) => {
-    this.#film.comments = this.#film.comments.filter((comment) => {
-      if (comment.id !== commentId) {
-        return true;
-      }
-    });
     this.#changeData(
+      UserAction.REMOVE_COMMENT,
       UpdateType.PATCH,
-      {...this.#film}
-    );
+      this.#film,
+      commentId);
   };
 
   #handleIsAddedToFavorite = () => {
     this.#changeData(
+      UserAction.UPDATE,
       this.#mode === Mode.EDITING ? UpdateType.PATCH : UpdateType.MINOR,
       {...this.#film, isAddedToFavorite: !this.#film.isAddedToFavorite});
   };
 
   #handleIsWatched = () => {
     this.#changeData(
+      UserAction.UPDATE,
       this.#mode === Mode.EDITING ? UpdateType.PATCH : UpdateType.MINOR,
       {...this.#film, isWatched: !this.#film.isWatched});
   };
 
   #handleIsAddedToWatchList = () => {
-    this.#changeData(
+    this.#changeData(UserAction.UPDATE,
       this.#mode === Mode.EDITING ? UpdateType.PATCH : UpdateType.MINOR,
       {...this.#film, isAddedToWatchList: !this.#film.isAddedToWatchList});
   };
 
   #handleSubmitComment = (newComment) => {
-    this.#film.comments = [...this.#film.comments ,newComment];
     this.#changeData(
+      UserAction.ADD_COMMENT,
       UpdateType.PATCH,
-      {...this.#film});
+      this.#film,
+      newComment);
   };
 
   destroy = () => {

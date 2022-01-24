@@ -27,10 +27,18 @@ export default class MoviesModel extends AbstractObservable {
     return this.#movies;
   }
 
-  getCommentsById = (movie) => {
-    this.#apiService.getComments(movie).then((result)=>PopupView.parseComments(result));
+  getComments = (updateType, movie) => {
+    this.#apiService.getComments(MoviesModel.adaptToServer(movie)).then((data)=>PopupView.parseComments(data));
+    this._notify(updateType, movie);
   };
 
+  postComment = (updateType, movie, localComment) => {
+    this.#apiService.postComment(MoviesModel.adaptToServer(movie), localComment).then((data)=>this._notify(updateType, this.#adaptToClient(data)));
+  };
+
+  removeComment = (updateType, comment)=>{
+    this.#apiService.deleteComment(comment).then(()=>this._notify(updateType));
+  };
 
   #adaptToClient = (movie) => {
     const adaptedMovie = {

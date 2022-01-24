@@ -25,3 +25,10 @@ export const MenuItem = {
   MOVIES : 'MOVIES',
   STATISTIC: 'STATISTIC',
 };
+
+export const UserAction = {
+  UPDATE: 'UPDATE',
+  GET_COMMENTS:'GET_COMMENTS',
+  ADD_COMMENT: 'ADD_COMMENT',
+  REMOVE_COMMENT: 'REMOVE_COMMENT',
+};

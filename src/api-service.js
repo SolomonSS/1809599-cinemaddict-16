@@ -36,12 +36,11 @@ export default class ApiService {
       method: Method.GET,
     }).then((data)=>ApiService.parseResponse(data));
     return response;
-    //return await ApiService.parseResponse(response);
   }
 
   postComment = async (movie, localComment) => {
     const response = await this.#load({
-      url: `comments/:${movie.id}`,
+      url: `comments/${movie.id}`,
       method: Method.POST,
       body: JSON.stringify(localComment),
     });
@@ -53,14 +52,10 @@ export default class ApiService {
 
   deleteComment = async (commentId) => {
     const response = await this.#load({
-      url: `comments/:${commentId}`,
-      method: Method.GET,
-      headers: new Headers({'Authorization': this.#authorization}),
-    });
-
-    const parsedResponse = await ApiService.parseResponse(response);
-
-    return parsedResponse;
+      url: `comments/${commentId}`,
+      method: Method.DELETE,
+    }).then((data)=>ApiService.parseResponse(data));
+    return response;
   }
 
   #load = async ({

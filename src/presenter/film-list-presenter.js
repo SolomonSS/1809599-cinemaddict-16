@@ -4,7 +4,7 @@ import SortListView, {SortTypes} from '../view/sort.js';
 import MainSheme from '../view/main-sheme.js';
 import {remove, render, RenderPosition, sortByDate, sortByRating} from '../utils/render.js';
 import FilmPresenter from './film-presenter.js';
-import {FILM_COUNT_PER_CLICK, filter, FilterTypes, UpdateType} from '../const.js';
+import {FILM_COUNT_PER_CLICK, filter, FilterTypes, UpdateType, UserAction} from '../const.js';
 import EmptyView from '../view/empty-view.js';
 import LoadingView from '../view/loading-view.js';
 
@@ -53,8 +53,38 @@ export default class FilmListPresenter {
     this.#filterModel.addObserver(this.#handleModelEvent);
   };
 
-  #handleViewAction = (updateType, update) => {
-    this.#moviesModel.updateMovie(updateType, update);
+  #handleViewAction = async (userAction, updateType, update, localComment) => {
+    switch (userAction){
+      case UserAction.UPDATE:
+        try {
+          await this.#moviesModel.updateMovie(updateType, update);
+        } catch (err){
+          throw new Error('Can\'t update');
+        }
+        break;
+      case UserAction.GET_COMMENTS:
+        try {
+          await this.#moviesModel.getComments(updateType, update);
+        }catch (err){
+          throw new Error('Can\'t get comments');
+        }
+        break;
+      case UserAction.ADD_COMMENT:
+        try{
+          await this.#moviesModel.postComment(updateType, update, localComment);
+        }catch (err){
+          throw new Error('Can\'t post comment');
+        }
+        break;
+      case UserAction.REMOVE_COMMENT:
+        try{
+          await this.#moviesModel.removeComment(updateType, localComment);
+        }catch (err){
+          throw new Error('Can\'t delete comment');
+        }
+        break;
+    }
+
   };
 
   destroy(){
@@ -157,7 +187,7 @@ export default class FilmListPresenter {
   };
 
   #renderFilmCard = (card) => {
-    const filmPresenter = new FilmPresenter(this.#filmsListContainer, this.#handleViewAction, this.#handleModeChange, this.#moviesModel.getCommentsById);
+    const filmPresenter = new FilmPresenter(this.#filmsListContainer, this.#handleViewAction, this.#handleModeChange);
     filmPresenter.init(card);
     this.#filmPresenter.set(card.id, filmPresenter);
   };
