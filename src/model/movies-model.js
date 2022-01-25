@@ -86,7 +86,7 @@ export default class MoviesModel extends AbstractObservable {
         date: movie.realise,
         release_country: movie.country,
       },
-      runtime: movie.duration,
+      runtime: movie.filmDuration,
       genre: [...movie.genres],
       age_rating: movie.censored,
     },
