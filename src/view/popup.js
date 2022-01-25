@@ -1,5 +1,4 @@
 import SmartView from './smart-view.js';
-import {nanoid} from 'nanoid';
 import he from 'he';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
@@ -14,6 +13,8 @@ const renderGenres = (genres) => {
   }
   return genresList;
 };
+
+const renderEmoji = (emoji) =>(`<img class="comment-emoji" src ='${emoji}' width="55" height="55" alt="">`);
 
 const renderComments = (comments) => {
   let commentsList = '';
@@ -114,7 +115,7 @@ const popupTemplate = (popup, comments) =>
 
         <div class="film-details__new-comment">
           <div class="film-details__add-emoji-label">
-          <span class="film-details__comment-emoji"><img class="comment-emoji" width="55" height="55" alt=""></span>
+            ${popup.emoji ? renderEmoji(popup.emoji) : ''}
           </div>
 
           <label class="film-details__comment-label">
@@ -215,7 +216,6 @@ export default class PopupView extends SmartView {
         return;
       }
       const newComment = {
-        id: nanoid(),
         commentText: he.encode(commentInput),
         emotion: emoji,
       };
@@ -258,9 +258,8 @@ export default class PopupView extends SmartView {
   };
 
   #emojiHandler = (evt) => {
-    const emoji = this.element.querySelector('.comment-emoji');
-    emoji.src = evt.target.src;
-    this.updateData(this._data);
+    this.updateData({...this._data, emoji: evt.target.src});
   };
 }
+
 
