@@ -4,6 +4,7 @@ export const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 export const FilterTypes = {
@@ -25,20 +26,9 @@ export const MenuItem = {
   STATISTIC: 'STATISTIC',
 };
 
-/*#filterTypeChangeHandler = (evt) => {
-    if (evt.target.tagName !== 'A') {
-      return;
-    }
-    evt.preventDefault();
-    if (evt.target.dataset.menuType === MenuItem.STATISTIC) {
-      this.#isActiveStatistic = true;
-      this._callback.menuClick(evt.target.dataset.menuType);
-      return;
-    }
-    if ((this.#isActiveStatistic) && (evt.target.dataset.menuType !== MenuItem.STATISTIC)) {
-      this.#currentFilter = FilterTypes.ALL;
-      this._callback.menuClick(evt.target.dataset.menuType);
-      this._callback.filterTypeChange(evt.target.id);
-    }
-    this._callback.filterTypeChange(evt.target.id);
-  };*/
+export const UserAction = {
+  UPDATE: 'UPDATE',
+  GET_COMMENTS:'GET_COMMENTS',
+  ADD_COMMENT: 'ADD_COMMENT',
+  REMOVE_COMMENT: 'REMOVE_COMMENT',
+};

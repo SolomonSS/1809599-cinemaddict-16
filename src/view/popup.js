@@ -1,6 +1,10 @@
 import SmartView from './smart-view.js';
-import {nanoid} from 'nanoid';
 import he from 'he';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
+dayjs.extend(relativeTime);
+dayjs.extend(duration);
 
 const renderGenres = (genres) => {
   let genresList = '';
@@ -10,18 +14,20 @@ const renderGenres = (genres) => {
   return genresList;
 };
 
+const renderEmoji = (emoji) =>(`<img class="comment-emoji" src ='${emoji}' width="55" height="55" alt="">`);
+
 const renderComments = (comments) => {
   let commentsList = '';
   for (const comment of comments) {
     commentsList += `<li class="film-details__comment">
             <span class="film-details__comment-emoji">
-              <img src="${comment.emotion}" width="55" height="55" alt="emoji-${comment.emotion.name}">
+              <img src="images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
             </span>
             <div>
-              <p class="film-details__comment-text">${comment.commentText}</p>
+              <p class="film-details__comment-text">${comment.comment}</p>
               <p class="film-details__comment-info">
-                <span class="film-details__comment-author">${comment.authorName ? comment.authorName : ''}</span>
-                <span class="film-details__comment-day">${comment.commentDate ? comment.commentDate : ''}</span>
+                <span class="film-details__comment-author">${comment.author ? comment.author : ''}</span>
+                <span class="film-details__comment-day">${comment.date ? dayjs(comment.date).fromNow() : ''}</span>
                 <button id="${comment.id}" class="film-details__comment-delete">Delete</button>
               </p>
             </div>
@@ -30,7 +36,7 @@ const renderComments = (comments) => {
   return commentsList;
 };
 
-const popupTemplate = (popup) =>
+const popupTemplate = (popup, comments) =>
   `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
         <div class="film-details__top-container">
@@ -70,11 +76,11 @@ const popupTemplate = (popup) =>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
-              <td class="film-details__cell">${popup.realiseFullDate}</td>
+              <td class="film-details__cell">${dayjs(popup.realiseFullDate).format('D MMM YYYY')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">${popup.filmDuration}</td>
+              <td class="film-details__cell">${dayjs.duration(popup.filmDuration, 'minutes').format('H[h] mm[m]')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Country</td>
@@ -102,13 +108,14 @@ const popupTemplate = (popup) =>
 
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">Comments<span class="film-details__comments-count">${popup.comments.length}</span></h3>
+        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${ popup.comments.length}</span></h3>
 
-        <ul class="film-details__comments-list"></ul>
-            ${renderComments(popup.comments)}
+        <ul class="film-details__comments-list"> ${comments ? renderComments(comments): ''}
+        </ul>
+
         <div class="film-details__new-comment">
           <div class="film-details__add-emoji-label">
-          <span class="film-details__comment-emoji"><img class="comment-emoji" src="${popup.commentEmoji}" width="55" height="55" alt=""></span>
+            ${popup.emoji ? renderEmoji(popup.emoji) : ''}
           </div>
 
           <label class="film-details__comment-label">
@@ -143,15 +150,16 @@ const popupTemplate = (popup) =>
   </section>`;
 
 export default class PopupView extends SmartView {
-
-  constructor(film) {
+  #comments;
+  constructor(film, comments) {
     super();
     this._data = film;
+    this.#comments = comments;
     this.#setInnerHandlers();
   }
 
   get template() {
-    return popupTemplate(this._data);
+    return popupTemplate(this._data, this.#comments);
   }
 
   reset = (data) => {
@@ -208,7 +216,6 @@ export default class PopupView extends SmartView {
         return;
       }
       const newComment = {
-        id: nanoid(),
         commentText: he.encode(commentInput),
         emotion: emoji,
       };
@@ -251,8 +258,8 @@ export default class PopupView extends SmartView {
   };
 
   #emojiHandler = (evt) => {
-    this.element.querySelector('.comment-emoji').src = evt.target.src;
-    this.updateData({commentEmoji: evt.target.src});
+    this.updateData({...this._data, emoji: evt.target.src});
   };
 }
+
 

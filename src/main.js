@@ -1,16 +1,18 @@
 import FilmListPresenter from './presenter/film-list-presenter.js';
 import {remove, render, RenderPosition} from './utils/render.js';
 import UserRankView from './view/user-rank-view';
-import {films} from './mocks/film.js';
 import MoviesModel from './model/movies-model.js';
 import FilterModel from './model/filter-model.js';
 import FilterPresenter from './presenter/filter-presenter';
 import {MenuItem} from './const.js';
 import FooterView from './view/footer-view.js';
 import StatisticView from './view/statistic-view.js';
+import ApiService from './api-service.js';
 
-const moviesModel = new MoviesModel();
-moviesModel.movies = films;
+const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
+const AUTHORIZATION = 'Basic jasndfas98';
+
+const moviesModel = new MoviesModel(new ApiService(END_POINT, AUTHORIZATION));
 
 const pageHeader = document.querySelector('.header');
 const pageMain = document.querySelector('.main');
@@ -44,7 +46,9 @@ const handleSiteMenuClick = (menuItem) =>{
   }
 };
 
-filterPresenter.setMenuStatisticClickHandler(handleSiteMenuClick);
-
-filterPresenter.init();
+moviesModel.init().finally(()=>{
+  filterPresenter.setMenuStatisticClickHandler(handleSiteMenuClick);
+  filterPresenter.init();
+});
 filmListPresenter.init();
+

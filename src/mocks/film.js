@@ -31,7 +31,6 @@ const COUNTRIES = ['Russia', 'Belarus', 'USA', 'France'];
 const DIRECTORS = ['ЛИ ААКЕР','ФРЭНК ДЖ. ААРД', 'ААШ ААРОН','Джадд Апатоу', 'Стивен Чбоски', 'Джеймс Айвори'];
 
 const getImgAddress = (type, list) => `images/${type}/${list[getRandomInteger(0, list.length - 1)]}`;
-
 const getFullDescription = () => {
   const randomArrayDescription = getRandomArray(DESCRIPTIONS,5);
   let description = '';

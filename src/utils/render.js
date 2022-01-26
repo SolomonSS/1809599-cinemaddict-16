@@ -59,6 +59,11 @@ export const remove = (component) => {
   component.element.remove();
   component.removeElement();
 };
-
+export const getShortDescription = (description) =>{
+  if (description.length > 140) {
+    description = `${description.slice(0, 139)}…`;
+  }
+  return description;
+};
 export const sortByDate = (movieA, movieB) => movieB.realise - movieA.realise;
 export const sortByRating = (movieA, movieB) => movieB.rating - movieA.rating;
