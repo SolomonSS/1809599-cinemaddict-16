@@ -17,9 +17,9 @@ const createFilmCardTemplate = (film) => `<article class="film-card">
             <span class="film-card__comments">${film.comments.length === 1 ? '1 comment' : ` ${film.comments.length} comments`}</span>
           </a>
           <div class="film-card__controls">
-            <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${film.isAddedToWatchList ? 'film-card__controls-item--active' : ''}" type="button">Add to watchlist</button>
-            <button class="film-card__controls-item film-card__controls-item--mark-as-watched ${film.isWatched ? 'film-card__controls-item--active' : ''}" type="button">Mark as watched</button>
-            <button class="film-card__controls-item film-card__controls-item--favorite ${film.isAddedToFavorite ? 'film-card__controls-item--active' : ''}" type="button">Mark as favorite</button>
+            <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${film.isAddedToWatchList ? 'film-card__controls-item--active' : ''}" type="button" ${film.isDisabled ? 'disabled':''}>Add to watchlist</button>
+            <button class="film-card__controls-item film-card__controls-item--mark-as-watched ${film.isWatched ? 'film-card__controls-item--active' : ''}" type="button" ${film.isDisabled ? 'disabled':''}>Mark as watched</button>
+            <button class="film-card__controls-item film-card__controls-item--favorite ${film.isAddedToFavorite ? 'film-card__controls-item--active' : ''}" type="button" ${film.isDisabled ? 'disabled':''}>Mark as favorite</button>
           </div>
    </article>`;
 
@@ -27,7 +27,7 @@ export default class FilmCardView extends SmartView {
 
   constructor(film) {
     super();
-    this._data = {...film};
+    this._data = FilmCardView.parseMovieToData(film);
   }
 
   get template() {
@@ -54,10 +54,6 @@ export default class FilmCardView extends SmartView {
     this.element.querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this.#addedToWatchListClickHandler);
   };
 
-  reset = (film) => {
-    this.updateData({...film});
-  }
-
   restoreHandlers = () => {
     this.element.querySelector('.film-card__controls-item--favorite').addEventListener('click', this.#favoriteClickHandler);
     this.element.querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this.#watchedClickHandler);
@@ -75,6 +71,11 @@ export default class FilmCardView extends SmartView {
     evt.preventDefault();
     this._callback.isAddedToWatchList();
   };
+
+  static parseMovieToData = (movie) => ({
+    ...movie,
+    isDisabled: false,
+  });
 
   #watchedClickHandler = (evt) => {
     evt.preventDefault();
