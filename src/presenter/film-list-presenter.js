@@ -7,6 +7,7 @@ import FilmPresenter from './film-presenter.js';
 import {FILM_COUNT_PER_CLICK, filter, FilterTypes, UpdateType, UserAction} from '../const.js';
 import EmptyView from '../view/empty-view.js';
 import LoadingView from '../view/loading-view.js';
+import {State} from './popup-presenter.js';
 
 export default class FilmListPresenter {
   #moviesModel = null;
@@ -57,30 +58,33 @@ export default class FilmListPresenter {
     switch (userAction){
       case UserAction.UPDATE:
         try {
+          this.#filmPresenter.get(update.id).setViewState(State.UPDATING);
           await this.#moviesModel.updateMovie(updateType, update);
         } catch (err){
-          throw new Error('Can\'t update');
+          this.#filmPresenter.get(update.id).setViewState(State.ABORTING);
         }
         break;
       case UserAction.GET_COMMENTS:
         try {
           await this.#moviesModel.getComments(updateType, update);
         }catch (err){
-          throw new Error('Can\'t get comments');
+          this.#filmPresenter.get(update.id).setViewState(State.ABORTING);
         }
         break;
       case UserAction.ADD_COMMENT:
         try{
+          this.#filmPresenter.get(update.id).setViewState(State.SAVING);
           await this.#moviesModel.postComment(updateType, update, localComment);
         }catch (err){
-          throw new Error('Can\'t post comment');
+          this.#filmPresenter.get(update.id).setViewState(State.ABORTING);
         }
         break;
       case UserAction.REMOVE_COMMENT:
         try{
-          await this.#moviesModel.removeComment(updateType, localComment);
+          this.#filmPresenter.get(update.id).setViewState(State.DELETING);
+          await this.#moviesModel.removeComment(updateType, update, localComment);
         }catch (err){
-          throw new Error('Can\'t delete comment');
+          this.#filmPresenter.get(update.id).setViewState(State.ABORTING);
         }
         break;
     }
@@ -136,7 +140,7 @@ export default class FilmListPresenter {
       return;
     }
     const moviesCount = this.movies.length;
-    const movies = this.movies.slice(0, Math.min(moviesCount, FILM_COUNT_PER_CLICK));
+    const movies = this.movies.slice(0, Math.min(moviesCount, this.#renderedFilmsCount));
     if(moviesCount === 0){
       this.#renderNoMovies();
       return;

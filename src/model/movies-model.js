@@ -38,12 +38,29 @@ export default class MoviesModel extends AbstractObservable {
     });
   };
 
-  postComment = (updateType, movie, localComment) => {
-    this.#apiService.postComment(MoviesModel.adaptToServer(movie), localComment).then((data) => this._notify(updateType, this.#adaptToClient(data)));
+  postComment = (updateType, update, localComment) => {
+    this.#apiService.postComment(MoviesModel.adaptToServer(update), localComment).then((response)=>{
+      const newMovie = this.#adaptToClient(response.movie);
+      this.#comments = response.comments;
+      this._notify(updateType, newMovie);
+    });
   };
 
-  removeComment = (updateType, comment) => {
-    this.#apiService.deleteComment(comment).then(() => this._notify(updateType));
+  removeComment =  (updateType, update, comment) => {
+    const index = this.#comments.findIndex((item) => item.id === comment);
+    if (index === -1) {
+      throw new Error('Can\'t remove unexisting comment');
+    }
+    try{
+      this.#apiService.deleteComment(comment).then(()=>{
+        this.#comments = [...this.#comments.slice(0, index), ...this.#comments.slice(index+1)];
+        this._notify(updateType, update);
+      });
+    }
+    catch (err){
+      throw new Error('Can\'t remove comment');
+    }
+
   };
 
   #adaptToClient = (movie) => ({

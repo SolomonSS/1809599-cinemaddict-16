@@ -2,8 +2,14 @@ import PopupView from '../view/popup.js';
 import {remove, replace} from '../utils/render.js';
 import {UpdateType, UserAction} from '../const.js';
 
+export const State = {
+  SAVING: 'SAVING',
+  DELETING: 'DELETING',
+  UPDATING: 'UPDATING',
+  ABORTING: 'ABORTING'
+};
 
-export default class PopupPresenter{
+export default class PopupPresenter {
   #film;
   #popup = null;
   #changeData = null;
@@ -15,7 +21,7 @@ export default class PopupPresenter{
     this.#changeMode = changeMode;
   }
 
-  init = (film, comments = []) =>{
+  init = (film, comments = []) => {
     this.#film = film;
     this.#comments = comments;
     const prevPopupComponent = this.#popup;
@@ -28,13 +34,13 @@ export default class PopupPresenter{
     this.#popup.setSubmitFormClickHandler(this.#handleSubmitComment);
     document.addEventListener('keydown', this.#escKeyDownHandler);
 
-    if(prevPopupComponent === null){
+    if (prevPopupComponent === null) {
       document.body.appendChild(this.#popup.element);
-    } else {
-      replace(this.#popup, prevPopupComponent);
-      remove(prevPopupComponent);
+      return;
     }
-  }
+    replace(this.#popup, prevPopupComponent);
+    remove(prevPopupComponent);
+  };
 
   resetView = () => {
     this.#removePopup();
@@ -48,13 +54,14 @@ export default class PopupPresenter{
       commentId);
   };
 
-  #handleClosePopupClick = () =>{
+  #handleClosePopupClick = () => {
     this.#removePopup();
-  }
+  };
 
   #removePopup = () => {
-    if(document.body.contains(this.#popup.element)){
+    if (document.body.contains(this.#popup.element)) {
       document.body.removeChild(this.#popup.element);
+      this.#popup = null;
     }
     this.#changeMode();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
@@ -73,6 +80,31 @@ export default class PopupPresenter{
       UpdateType.PATCH,
       {...this.#film, isWatched: !this.#film.isWatched});
   };
+
+  setViewState = (state) => {
+    switch (state) {
+      case State.DELETING:
+        this.#popup.updateData({isDeleting: true});
+        break;
+      case State.SAVING:
+        this.#popup.updateData({isSaving: true});
+        break;
+      case State.UPDATING:
+        this.#popup.updateData({isDisabled: true});
+        break;
+      case State.ABORTING:
+        this.#popup.shake(this.#resetStateView);
+        break;
+    }
+  };
+
+  #resetStateView = () =>{
+    this.#popup.updateData({
+      isDisabled: false,
+      isDeleting: false,
+      isSaving: false
+    });
+  }
 
   #handleIsAddedToWatchList = () => {
     this.#changeData(UserAction.UPDATE,
