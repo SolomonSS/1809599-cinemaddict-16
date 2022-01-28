@@ -42,18 +42,16 @@ export default class ApiService {
       url: `comments/${movie.id}`,
       method: Method.POST,
       body: JSON.stringify(localComment),
-    });
-
-    const parsedResponse = await ApiService.parseResponse(response);
-
-    return parsedResponse;
+      headers: new Headers({'Content-Type': 'application/json'}),
+    }).then((data)=>ApiService.parseResponse(data));
+    return response;
   }
 
   deleteComment = async (commentId) => {
     const response = await this.#load({
       url: `comments/${commentId}`,
       method: Method.DELETE,
-    }).then((data)=>ApiService.parseResponse(data));
+    });
     return response;
   }
 

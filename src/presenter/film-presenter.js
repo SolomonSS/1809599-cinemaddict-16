@@ -1,7 +1,7 @@
 import FilmCardView from '../view/film-card-view.js';
 import {remove, render, RenderPosition, replace} from '../utils/render.js';
 import {UpdateType, UserAction} from '../const.js';
-import PopupPresenter from './popup-presenter';
+import PopupPresenter, {State} from './popup-presenter';
 
 export const Mode = {
   DEFAULT: 'DEFAULT',
@@ -38,19 +38,17 @@ export default class FilmPresenter {
     if (prevFilmComponent === null) {
       render(this.#filmsContainer, this.#filmCard.element, RenderPosition.BEFOREEND);
       return;
-    }
-
-    if(this.#mode === Mode.DEFAULT){
+    } else {
       replace(this.#filmCard, prevFilmComponent);
       remove(prevFilmComponent);
     }
-    if(this.#mode === Mode.POPUP){
+    if (this.#mode === Mode.POPUP) {
       this.#popupPresenter.init(this.#film, this.#comments);
     }
   };
 
   resetView = () => {
-    if(this.#mode !== Mode.DEFAULT) {
+    if (this.#mode !== Mode.DEFAULT) {
       this.#popupPresenter.resetView();
     }
   };
@@ -62,12 +60,30 @@ export default class FilmPresenter {
 
   changeModeOnDefault = () => {
     this.#mode = Mode.DEFAULT;
-  }
+  };
+
+  setViewState = (state) => {
+    if (this.#mode === Mode.DEFAULT) {
+      if (state === State.UPDATING) {
+        this.#filmCard.updateData({isDisabled: true});
+        return;
+      }
+      if (state === State.ABORTING) {
+        this.#filmCard.shake(this.resetViewState);
+        return;
+      }
+    }
+    this.#popupPresenter.setViewState(state);
+  };
+
+  resetViewState = () => {
+    this.#filmCard.updateData({isDisabled: false});
+  };
 
   #handleOpenPopupClick = () => {
     this.#changeMode();
     this.#addPopup();
-  }
+  };
 
   #handleIsAddedToFavorite = () => {
     this.#changeData(

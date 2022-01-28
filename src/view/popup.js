@@ -3,6 +3,7 @@ import he from 'he';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
+
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
@@ -14,9 +15,9 @@ const renderGenres = (genres) => {
   return genresList;
 };
 
-const renderEmoji = (emoji) =>(`<img class="comment-emoji" src ='${emoji}' width="55" height="55" alt="">`);
+const renderEmoji = (emoji) => (`<img class="comment-emoji" src ='./images/emoji/${emoji}.png' width="55" height="55" alt="${emoji}">`);
 
-const renderComments = (comments) => {
+const renderComments = (popup, comments) => {
   let commentsList = '';
   for (const comment of comments) {
     commentsList += `<li class="film-details__comment">
@@ -28,7 +29,7 @@ const renderComments = (comments) => {
               <p class="film-details__comment-info">
                 <span class="film-details__comment-author">${comment.author ? comment.author : ''}</span>
                 <span class="film-details__comment-day">${comment.date ? dayjs(comment.date).fromNow() : ''}</span>
-                <button id="${comment.id}" class="film-details__comment-delete">Delete</button>
+                <button id="${comment.id}" ${popup.isDeleting ? 'disabled': ''} class="film-details__comment-delete">${popup.isDeleting ? 'Deleting':'Delete' }</button>
               </p>
             </div>
           </li>`;
@@ -100,17 +101,17 @@ const popupTemplate = (popup, comments) =>
         </div>
 
       <section class="film-details__controls">
-        <button type="button" class="film-details__control-button film-details__control-button--watchlist ${popup.isAddedToWatchList ? 'film-details__control-button--active' : ''}" id="watchlist" name="watchlist">Add to watchlist</button>
-        <button type="button" class="film-details__control-button film-details__control-button--watched ${popup.isWatched ? 'film-details__control-button--active' : ''}" id="watched" name="watched">Already watched</button>
-        <button type="button" class="film-details__control-button film-details__control-button--favorite ${popup.isAddedToFavorite ? 'film-details__control-button--active' : ''}" id="favorite" name="favorite">Add to favorites</button>
+        <button type="button" class="film-details__control-button film-details__control-button--watchlist ${popup.isAddedToWatchList ? 'film-details__control-button--active' : ''}" id="watchlist" ${popup.isDisabled ? 'disabled':''} name="watchlist">Add to watchlist</button>
+        <button type="button" class="film-details__control-button film-details__control-button--watched ${popup.isWatched ? 'film-details__control-button--active' : ''}" id="watched" name="watched" ${popup.isDisabled ? 'disabled':''}>Already watched</button>
+        <button type="button" class="film-details__control-button film-details__control-button--favorite ${popup.isAddedToFavorite ? 'film-details__control-button--active' : ''}" id="favorite" name="favorite" ${popup.isDisabled ? 'disabled':''}>Add to favorites</button>
       </section>
     </div>
 
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${ popup.comments.length}</span></h3>
+        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${popup.comments.length}</span></h3>
 
-        <ul class="film-details__comments-list"> ${comments ? renderComments(comments): ''}
+        <ul class="film-details__comments-list"> ${comments ? renderComments(popup, comments) : ''}
         </ul>
 
         <div class="film-details__new-comment">
@@ -119,28 +120,28 @@ const popupTemplate = (popup, comments) =>
           </div>
 
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${popup.isSaving ? 'disabled':''}></textarea>
           </label>
 
           <div class="film-details__emoji-list">
             <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
             <label class="film-details__emoji-label" for="emoji-smile">
-              <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
+              <img src="./images/emoji/smile.png" width="30" height="30" alt="smile">
             </label>
 
             <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
             <label class="film-details__emoji-label" for="emoji-sleeping">
-              <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
+              <img src="./images/emoji/sleeping.png" width="30" height="30" alt="sleeping">
             </label>
 
             <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
             <label class="film-details__emoji-label" for="emoji-puke">
-              <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
+              <img src="./images/emoji/puke.png" width="30" height="30" alt="puke">
             </label>
 
             <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
             <label class="film-details__emoji-label" for="emoji-angry">
-              <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
+              <img src="./images/emoji/angry.png" width="30" height="30" alt="angry">
                         </label>
                     </div>
                 </div>
@@ -151,9 +152,10 @@ const popupTemplate = (popup, comments) =>
 
 export default class PopupView extends SmartView {
   #comments;
+
   constructor(film, comments) {
     super();
-    this._data = film;
+    this._data = PopupView.parseMovieToData(film);
     this.#comments = comments;
     this.#setInnerHandlers();
   }
@@ -161,10 +163,6 @@ export default class PopupView extends SmartView {
   get template() {
     return popupTemplate(this._data, this.#comments);
   }
-
-  reset = (data) => {
-    this.updateData({...data});
-  };
 
   restoreHandlers = () => {
     this.#setInnerHandlers();
@@ -211,12 +209,12 @@ export default class PopupView extends SmartView {
   #submitFormKeyDown = (evt) => {
     if ((evt.ctrlKey || evt.metaKey) && evt.key === 'Enter') {
       const commentInput = this.element.querySelector('.film-details__comment-input').value;
-      const emoji = this.element.querySelector('.comment-emoji').src;
+      const emoji = this.element.querySelector('.comment-emoji').alt;
       if (!commentInput || !emoji) {
         return;
       }
       const newComment = {
-        commentText: he.encode(commentInput),
+        comment: he.encode(commentInput),
         emotion: emoji,
       };
       this._callback.submitComment(newComment);
@@ -252,13 +250,20 @@ export default class PopupView extends SmartView {
     this._callback.watched();
   };
 
+  static parseMovieToData = (movie) => ({
+    ...movie,
+    isDisabled: false,
+    isDeleting: false,
+    isSaving: false,
+  });
+
   #closeButtonClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.closeButton();
   };
 
   #emojiHandler = (evt) => {
-    this.updateData({...this._data, emoji: evt.target.src});
+    this.updateData({...this._data, emoji: evt.target.alt});
   };
 }
 
