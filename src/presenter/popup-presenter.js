@@ -47,12 +47,20 @@ export default class PopupPresenter {
   };
 
   #handleDeleteCommentClick = (commentId) => {
+    this.#setStateCommentDelete(commentId);
     this.#changeData(
       UserAction.REMOVE_COMMENT,
       UpdateType.PATCH,
       this.#film,
       commentId);
   };
+
+  #setStateCommentDelete = (commentId) => {
+    this.#popup.updateData({
+      idCommentDelete: commentId,
+    });
+
+  }
 
   #handleClosePopupClick = () => {
     this.#removePopup();

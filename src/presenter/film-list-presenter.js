@@ -151,7 +151,7 @@ export default class FilmListPresenter {
       this.#renderShowMoreButton();
     }
     if(this.#topRated === null) {
-      this.#topRated = new TopRatedTemplateView(this.movies);
+      this.#topRated = new TopRatedTemplateView(this.movies, this.#handleViewAction, this.#handleModeChange);
       render(this.#mainContainer, this.#topRated.element, RenderPosition.AFTEREND);
     }
   };

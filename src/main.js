@@ -6,7 +6,7 @@ import FilterModel from './model/filter-model.js';
 import FilterPresenter from './presenter/filter-presenter';
 import {MenuItem} from './const.js';
 import FooterView from './view/footer-view.js';
-import StatisticView from './view/statistic-view.js';
+import StatisticView from './view/statistic/statistic-view.js';
 import ApiService from './api-service.js';
 
 const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
@@ -19,7 +19,7 @@ const pageMain = document.querySelector('.main');
 const pageFooter = document.querySelector('.footer__statistics');
 
 render(pageHeader, new UserRankView().element, RenderPosition.BEFOREEND);
-render(pageFooter, new FooterView(moviesModel.movies.length).element, RenderPosition.AFTERBEGIN);
+
 
 const filtersModel = new FilterModel();
 const filterPresenter = new FilterPresenter(pageMain, moviesModel, filtersModel);
@@ -49,6 +49,8 @@ const handleSiteMenuClick = (menuItem) =>{
 moviesModel.init().finally(()=>{
   filterPresenter.setMenuStatisticClickHandler(handleSiteMenuClick);
   filterPresenter.init();
+  render(pageFooter, new FooterView(moviesModel.movies.length).element, RenderPosition.AFTERBEGIN);
 });
 filmListPresenter.init();
+
 
