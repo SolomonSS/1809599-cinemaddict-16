@@ -251,3 +251,6 @@ export default class StatisticView extends SmartView {
   };
 }
 
+export {getWatched, getUserRank};
+
+

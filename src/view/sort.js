@@ -6,17 +6,23 @@ export const SortTypes = {
   RATING: 'rating',
 };
 
-const createSortList = () => (
+const createSortList = (activeSort) => (
   `<ul class="sort">
-    <li><a href="#" class="sort__button sort__button--active" data-sort-type="${SortTypes.DEFAULT}">Sort by default</a></li>
-    <li><a href="#" class="sort__button" data-sort-type="${SortTypes.DATE}">Sort by date</a></li>
-    <li><a href="#" class="sort__button" data-sort-type="${SortTypes.RATING}">Sort by rating</a></li>
+    <li><a href="#" class="sort__button ${activeSort === SortTypes.DEFAULT ? 'sort__button--active' : ''}" data-sort-type="${SortTypes.DEFAULT}">Sort by default</a></li>
+    <li><a href="#" class="sort__button ${activeSort === SortTypes.DATE ? 'sort__button--active' : ''}"  data-sort-type="${SortTypes.DATE}">Sort by date</a></li>
+    <li><a href="#" class="sort__button ${activeSort === SortTypes.RATING ? 'sort__button--active' : ''}" data-sort-type="${SortTypes.RATING}">Sort by rating</a></li>
   </ul>`
 );
 
 export default class SortListView extends SmartView {
+  #activeSort;
+  constructor(activeSort) {
+    super();
+    this.#activeSort = activeSort;
+  }
+
   get template() {
-    return createSortList();
+    return createSortList(this.#activeSort);
   }
 
   setSortTypeHandler = (callback) => {
@@ -31,17 +37,6 @@ export default class SortListView extends SmartView {
 
     evt.preventDefault();
     this._callback.sortTypeChange(evt.target.dataset.sortType);
-    this.#renderActiveSortType(evt.target);
-    this.updateData();
-  };
-
-  #renderActiveSortType = (sortButton) => {
-    this.element.querySelectorAll('.sort__button').forEach((button) => {
-      if (button.classList.contains('sort__button--active')) {
-        button.classList.remove('sort__button--active');
-      }
-    });
-    sortButton.classList.add('sort__button--active');
   };
 
   restoreHandlers = () => {

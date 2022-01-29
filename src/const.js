@@ -32,3 +32,6 @@ export const UserAction = {
   ADD_COMMENT: 'ADD_COMMENT',
   REMOVE_COMMENT: 'REMOVE_COMMENT',
 };
+
+export const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
+export const AUTHORIZATION = 'Basic jasndfas98';

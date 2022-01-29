@@ -2,7 +2,7 @@ import FilterView from '../view/filters-view.js';
 import {remove, render, RenderPosition, replace} from '../utils/render.js';
 import {filter, FilterTypes, UpdateType} from '../const.js';
 
-export default class FilterPresenter{
+export default class FilterPresenter {
   #filterComponent = null;
   #renderPlace = null;
   #movieModel = null;
@@ -42,7 +42,7 @@ export default class FilterPresenter{
     ];
   }
 
-  init = () =>{
+  init = () => {
     const filters = this.filters;
     const prevFilterComponent = this.#filterComponent;
     this.#filterComponent = new FilterView(filters, this.#filterModel.filter);
@@ -51,13 +51,13 @@ export default class FilterPresenter{
     this.#filterModel.addObserver(this.#handleModelEvent);
     this.#movieModel.addObserver(this.#handleModelEvent);
 
-    if(prevFilterComponent === null){
-      render(this.#renderPlace, this.#filterComponent.element, RenderPosition.AFTERBEGIN);
+    if (prevFilterComponent === null) {
+      render(this.#renderPlace, this.#filterComponent.element, RenderPosition.BEFOREBEGIN);
       return;
     }
     replace(this.#filterComponent, prevFilterComponent);
     remove(prevFilterComponent);
-  }
+  };
 
   destroy = () => {
     remove(this.#filterComponent);
@@ -65,23 +65,21 @@ export default class FilterPresenter{
 
     this.#movieModel.removeObserver(this.#handleModelEvent);
     this.#filterModel.removeObserver(this.#handleModelEvent);
-
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterTypes.ALL);
-  }
+  };
 
   #handleModelEvent = () => {
     this.init();
-  }
+  };
 
   setMenuStatisticClickHandler = (callback) => {
     this.#menuClickCallback = callback;
-  }
+  };
 
   #handleFilterTypeChange = (filterType) => {
     if (this.#filterModel.filter === filterType) {
       return;
     }
-
     this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
-  }
+  };
 }
