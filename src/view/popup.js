@@ -29,7 +29,7 @@ const renderComments = (popup, comments) => {
               <p class="film-details__comment-info">
                 <span class="film-details__comment-author">${comment.author ? comment.author : ''}</span>
                 <span class="film-details__comment-day">${comment.date ? dayjs(comment.date).fromNow() : ''}</span>
-                <button id="${comment.id}" ${popup.isDeleting ? 'disabled': ''} class="film-details__comment-delete">${popup.isDeleting ? 'Deleting':'Delete' }</button>
+                <button id="${comment.id}" ${popup.idCommentDelete === comment.id ? 'disabled': ''} class="film-details__comment-delete">${popup.idCommentDelete === comment.id ? 'Deleting':'Delete' }</button>
               </p>
             </div>
           </li>`;
@@ -109,7 +109,7 @@ const popupTemplate = (popup, comments) =>
 
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${popup.comments.length}</span></h3>
+        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
         <ul class="film-details__comments-list"> ${comments ? renderComments(popup, comments) : ''}
         </ul>
@@ -253,7 +253,6 @@ export default class PopupView extends SmartView {
   static parseMovieToData = (movie) => ({
     ...movie,
     isDisabled: false,
-    isDeleting: false,
     isSaving: false,
   });
 

@@ -22,13 +22,13 @@ export default class FilmPresenter {
     this.#filmsContainer = container;
     this.#changeData = changeData;
     this.#changeMode = changeMode;
+    this.#popupPresenter = new PopupPresenter(changeData, this.changeModeOnDefault);
   }
 
   init = (film, comments = []) => {
     this.#film = film;
     this.#comments = comments;
     const prevFilmComponent = this.#filmCard;
-    this.#popupPresenter = new PopupPresenter(this.#changeData, this.changeModeOnDefault);
     this.#filmCard = new FilmCardView(this.#film);
     this.#filmCard.setFilmCardClickHandler(this.#handleOpenPopupClick);
     this.#filmCard.setIsFavoriteClickHandler(this.#handleIsAddedToFavorite);
@@ -40,11 +40,11 @@ export default class FilmPresenter {
       return;
     } else {
       replace(this.#filmCard, prevFilmComponent);
-      remove(prevFilmComponent);
     }
     if (this.#mode === Mode.POPUP) {
       this.#popupPresenter.init(this.#film, this.#comments);
     }
+    remove(prevFilmComponent);
   };
 
   resetView = () => {

@@ -1,15 +1,48 @@
-import SmartView from './smart-view.js';
+import SmartView from '../smart-view.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import dayjs from 'dayjs';
-import {replace} from '../utils/render.js';
+import {replace} from '../../utils/render.js';
+import StatisticDataComponent, {getWatched} from './statistic-data-component.js';
 
-const createStatisticsTemplate = () => (
+const Ranks = {
+  novice:{
+    min: 1,
+    max:10,
+    name: 'novice'
+  },
+  fan:{
+    min: 11,
+    max:20,
+    name: 'fan'
+  },
+  movieBuff:{
+    min:21,
+    name:'movie buff',
+  }
+};
+
+const getUserRank = (data) => {
+  const watched = getWatched(data);
+  let rank;
+  if(watched.length>=Ranks.novice.min && watched.length<=Ranks.novice.max){
+    rank = Ranks.novice.name;
+  }
+  if(watched.length>=Ranks.fan.min && watched.length<=Ranks.fan.max){
+    rank = Ranks.fan.name;
+  }
+  if(watched.length>= Ranks.movieBuff.min){
+    rank = Ranks.movieBuff.name;
+  }
+  return rank;
+};
+
+const createStatisticsTemplate = (data) => (
   `<section class="statistic">
     <p class="statistic__rank">
       Your rank
       <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-      <span class="statistic__rank-label">Movie buff</span>
+      <span class="statistic__rank-label">${getUserRank(data)}</span>
     </p>
 
     <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
@@ -30,35 +63,22 @@ const createStatisticsTemplate = () => (
       <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="year">
       <label for="statistic-year" class="statistic__filters-label">Year</label>
     </form>
+    <div class="stat-data"></div>
 
-    <ul class="statistic__text-list">
-      <li class="statistic__text-item">
-        <h4 class="statistic__item-title">You watched</h4>
-        <p class="statistic__item-text">28 <span class="statistic__item-description">movies</span></p>
-      </li>
-      <li class="statistic__text-item">
-        <h4 class="statistic__item-title">Total duration</h4>
-        <p class="statistic__item-text">69 <span class="statistic__item-description">h</span> 41 <span class="statistic__item-description">m</span></p>
-      </li>
-      <li class="statistic__text-item">
-        <h4 class="statistic__item-title">Top genre</h4>
-        <p class="statistic__item-text">Drama</p>
-      </li>
-    </ul>
     <div class="statistic__chart-wrap">
       <canvas class="statistic__chart" width="1000"></canvas>
     </div>
 
   </section>`);
 
-const makeItemsUniq = (genresEachMovie) => {
+export const makeItemsUniq = (genresEachMovie) => {
   const genresList = new Set();
   genresEachMovie.forEach((movie) =>
     movie.forEach((genre) => genresList.add(genre)));
   return genresList;
 };
 
-const countMoviesByGenre = (movies, genres) => {
+export const countMoviesByGenre = (movies, genres) => {
   const moviesPerGenre = [];
   genres.forEach(() => moviesPerGenre.push(0));
   for (let i = 0; i < genres.length; i++) {
@@ -139,6 +159,7 @@ export default class StatisticView extends SmartView {
   _data;
   #movieChart = null;
   currentPeriod = 'all-time';
+  #statDataComponent = null;
 
   constructor(movies) {
     super();
@@ -147,6 +168,8 @@ export default class StatisticView extends SmartView {
 
     this.#setChart(this._data);
     this.restoreHandlers();
+    this.#statDataComponent = new StatisticDataComponent(this._data);
+    this.#statDataComponent.render(this.element.querySelector('.stat-data'));
   }
 
   get template() {
@@ -158,10 +181,12 @@ export default class StatisticView extends SmartView {
       if (evt.target.tagName !== 'INPUT'||evt.target.value === this.currentPeriod){
         return;
       }
-      const prevMovieChart = this.#movieChart;
+      const prevStatDataComponent = this.#statDataComponent;
       this.currentPeriod = evt.target.value;
+      const data = [...this.#periodTimeChange(this.currentPeriod)];
+      this.#statDataComponent = new StatisticDataComponent(data);
+      replace(this.#statDataComponent, prevStatDataComponent);
       this.#setChart();
-      replace(this.#movieChart, prevMovieChart);
     });
   }
 
@@ -225,3 +250,4 @@ export default class StatisticView extends SmartView {
     }
   };
 }
+
