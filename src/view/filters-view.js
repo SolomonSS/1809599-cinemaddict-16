@@ -24,13 +24,11 @@ const createFilterTemplate = (filterItems, currentFilterType) => {
 export default class FilterView extends AbstractView {
   #currentFilter = null;
   #filters = null;
-  #isActiveSort = false;
 
   constructor(filters, currentFilter) {
     super();
     this.#currentFilter = currentFilter;
     this.#filters = filters;
-    this.element.addEventListener('click', this.#filterTypeChangeHandler);
   }
 
   get template() {
@@ -48,26 +46,11 @@ export default class FilterView extends AbstractView {
     }
     evt.preventDefault();
     if (evt.target.dataset.menuType === MenuItem.STATISTIC) {
-      this.#isActiveSort = true;
       this._callback.menuClick(evt.target.dataset.menuType);
     } else {
       this._callback.menuClick(evt.target.dataset.menuType);
       this._callback.filterTypeChange(evt.target.id);
     }
-    /*if (evt.target.dataset.menuType === MenuItem.STATISTIC) {
-      this.#isActiveSort = true;
-      this._callback.menuClick(evt.target.dataset.menuType);
-      return;
-    }
-    if(this.#isActiveSort && evt.target.dataset.menuType === MenuItem.MOVIES){
-      this._callback.menuClick(evt.target.dataset.menuType);
-      this._callback.filterTypeChange();
-      this.#isActiveSort = false;
-      return;
-    }
-    if(!this.#isActiveSort && evt.target.dataset.menuType === MenuItem.MOVIES){
-      this._callback.filterTypeChange(evt.target.id);
-    }*/
   };
 
   setStatisticsClickHandler = (callback) => {
