@@ -1,6 +1,6 @@
 import SmartView from './smart-view.js';
 
-export const SortTypes = {
+export const SortType = {
   DEFAULT: 'default',
   DATE: 'date',
   RATING: 'rating',
@@ -8,13 +8,13 @@ export const SortTypes = {
 
 const createSortList = (activeSort) => (
   `<ul class="sort">
-    <li><a href="#" class="sort__button ${activeSort === SortTypes.DEFAULT ? 'sort__button--active' : ''}" data-sort-type="${SortTypes.DEFAULT}">Sort by default</a></li>
-    <li><a href="#" class="sort__button ${activeSort === SortTypes.DATE ? 'sort__button--active' : ''}"  data-sort-type="${SortTypes.DATE}">Sort by date</a></li>
-    <li><a href="#" class="sort__button ${activeSort === SortTypes.RATING ? 'sort__button--active' : ''}" data-sort-type="${SortTypes.RATING}">Sort by rating</a></li>
+    <li><a href="#" class="sort__button ${activeSort === SortType.DEFAULT ? 'sort__button--active' : ''}" data-sort-type="${SortType.DEFAULT}">Sort by default</a></li>
+    <li><a href="#" class="sort__button ${activeSort === SortType.DATE ? 'sort__button--active' : ''}"  data-sort-type="${SortType.DATE}">Sort by date</a></li>
+    <li><a href="#" class="sort__button ${activeSort === SortType.RATING ? 'sort__button--active' : ''}" data-sort-type="${SortType.RATING}">Sort by rating</a></li>
   </ul>`
 );
 
-export default class SortListView extends SmartView {
+export default class SortView extends SmartView {
   #activeSort;
   constructor(activeSort) {
     super();

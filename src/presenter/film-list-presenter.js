@@ -1,7 +1,7 @@
-import TopRatedTemplateView from '../view/top-rated.js';
+import TopRatedTemplateView from '../view/top-rated-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
-import SortListView, {SortTypes} from '../view/sort.js';
-import MainSheme from '../view/main-sheme.js';
+import SortView, {SortType} from '../view/sort-view.js';
+import MainShemeView from '../view/main-sheme-view.js';
 import {remove, render, RenderPosition, sortByDate, sortByRating} from '../utils/render.js';
 import FilmPresenter from './film-presenter.js';
 import {FILM_COUNT_PER_CLICK, filter, FilterTypes, UpdateType, UserAction} from '../const.js';
@@ -16,13 +16,13 @@ export default class FilmListPresenter {
   #showMoreButton = new ShowMoreButtonView();
   #sortList;
   #userRank;
-  #mainSheme = new MainSheme();
+  #mainSheme = new MainShemeView();
   #loadingComponent = new LoadingView();
   #renderedFilmsCount = FILM_COUNT_PER_CLICK;
   #mainContainer;
   #filmPresenter = new Map();
   #filmsListContainer;
-  _currentSortType = SortTypes.DEFAULT;
+  _currentSortType = SortType.DEFAULT;
   #filterModel = null;
   #filterType = FilterTypes.ALL;
   #noMoviesComponent = null;
@@ -40,9 +40,9 @@ export default class FilmListPresenter {
     const filteredMovies = filter[this.#filterType](movies);
 
     switch (this._currentSortType) {
-      case SortTypes.DATE:
+      case SortType.DATE:
         return filteredMovies.sort(sortByDate);
-      case SortTypes.RATING:
+      case SortType.RATING:
         return filteredMovies.sort(sortByRating);
     }
     return filter[this.#filterType](this.#moviesModel.movies);
@@ -59,8 +59,8 @@ export default class FilmListPresenter {
   #handleViewAction = async (userAction, updateType, update, localComment) => {
     switch (userAction) {
       case UserAction.UPDATE:
+        this.#filmPresenter.get(update.id).setViewState(State.UPDATING);
         try {
-          this.#filmPresenter.get(update.id).setViewState(State.UPDATING);
           await this.#moviesModel.updateMovie(updateType, update);
         } catch (err) {
           this.#filmPresenter.get(update.id).setViewState(State.ABORTING);
@@ -74,19 +74,19 @@ export default class FilmListPresenter {
         }
         break;
       case UserAction.ADD_COMMENT:
+        this.#filmPresenter.get(update.id).setViewState(State.SAVING);
         try {
-          this.#filmPresenter.get(update.id).setViewState(State.SAVING);
           await this.#moviesModel.postComment(updateType, update, localComment);
         } catch (err) {
           this.#filmPresenter.get(update.id).setViewState(State.ABORTING);
         }
         break;
       case UserAction.REMOVE_COMMENT:
+        this.#filmPresenter.get(update.id).setViewState(State.DELETING);
         try {
-          this.#filmPresenter.get(update.id).setViewState(State.DELETING);
           await this.#moviesModel.removeComment(updateType, update, localComment);
         } catch (err) {
-          this.#filmPresenter.get(update.id).setViewState(State.ABORTING);
+          this.#filmPresenter.get(update.id).setViewState(State.ABORTING ,UserAction.REMOVE_COMMENT);
         }
         break;
     }
@@ -164,12 +164,6 @@ export default class FilmListPresenter {
     if (moviesCount > FILM_COUNT_PER_CLICK) {
       this.#renderShowMoreButton();
     }
-    this.#renderTopRated();
-  };
-
-  #renderTopRated = () => {
-    this.#topRated = new TopRatedTemplateView(this.movies, this.#handleViewAction, this.#handleModeChange);
-    render(this.#mainContainer, this.#topRated.element, RenderPosition.AFTEREND);
   };
 
   #renderShowMoreButton = () => {
@@ -193,7 +187,7 @@ export default class FilmListPresenter {
 
 
   #renderSortView = () => {
-    this.#sortList = new SortListView(this._currentSortType);
+    this.#sortList = new SortView(this._currentSortType);
     render(this.#mainContainer, this.#sortList.element, RenderPosition.AFTERBEGIN);
     this.#sortList.setSortTypeHandler(this.#handleSortTypeChange);
   };
@@ -227,7 +221,6 @@ export default class FilmListPresenter {
     this.#filmPresenter.clear();
     this.#buttonRemove();
     remove(this.#userRank);
-    remove(this.#topRated);
     remove(this.#sortList);
     remove(this.#loadingComponent);
     if (resetRenderedMoviesCount) {
@@ -236,7 +229,7 @@ export default class FilmListPresenter {
       this.#renderedFilmsCount = Math.min(moviesCount, this.#renderedFilmsCount);
     }
     if (resetSortType) {
-      this._currentSortType = SortTypes.DEFAULT;
+      this._currentSortType = SortType.DEFAULT;
     }
     if (this.#noMoviesComponent) {
       remove(this.#noMoviesComponent);

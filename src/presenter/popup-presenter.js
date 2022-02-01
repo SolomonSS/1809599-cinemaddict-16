@@ -1,4 +1,4 @@
-import PopupView from '../view/popup.js';
+import PopupView from '../view/popup-view.js';
 import {remove, replace} from '../utils/render.js';
 import {UpdateType, UserAction} from '../const.js';
 
@@ -15,6 +15,7 @@ export default class PopupPresenter {
   #changeData = null;
   #changeMode = null;
   #comments;
+  #deletingComment;
 
   constructor(changeData, changeMode) {
     this.#changeData = changeData;
@@ -47,7 +48,7 @@ export default class PopupPresenter {
   };
 
   #handleDeleteCommentClick = (commentId) => {
-    this.#setStateCommentDelete(commentId);
+    this.#deletingComment = commentId;
     this.#changeData(
       UserAction.REMOVE_COMMENT,
       UpdateType.PATCH,
@@ -89,10 +90,10 @@ export default class PopupPresenter {
       {...this.#film, isWatched: !this.#film.isWatched});
   };
 
-  setViewState = (state) => {
+  setViewState = (state, userAction) => {
     switch (state) {
       case State.DELETING:
-        this.#popup.updateData({isDeleting: true});
+        this.#setStateCommentDelete(this.#deletingComment);
         break;
       case State.SAVING:
         this.#popup.updateData({isSaving: true});
@@ -101,6 +102,10 @@ export default class PopupPresenter {
         this.#popup.updateData({isDisabled: true});
         break;
       case State.ABORTING:
+        if(userAction === UserAction.REMOVE_COMMENT){
+          this.#popup.shakeComments(this.#resetStateView);
+          return;
+        }
         this.#popup.shake(this.#resetStateView);
         break;
     }
@@ -109,8 +114,8 @@ export default class PopupPresenter {
   #resetStateView = () =>{
     this.#popup.updateData({
       isDisabled: false,
-      isDeleting: false,
-      isSaving: false
+      idCommentDelete: null,
+      isSaving: false,
     });
   }
 

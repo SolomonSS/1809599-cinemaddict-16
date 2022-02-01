@@ -72,11 +72,6 @@ export default class FilmCardView extends SmartView {
     this._callback.isAddedToWatchList();
   };
 
-  static parseMovieToData = (movie) => ({
-    ...movie,
-    isDisabled: false,
-  });
-
   #watchedClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.isWatched();
@@ -86,4 +81,9 @@ export default class FilmCardView extends SmartView {
     evt.preventDefault();
     this._callback.isFavorite();
   };
+
+  static parseMovieToData = (movie) => ({
+    ...movie,
+    isDisabled: false,
+  });
 }

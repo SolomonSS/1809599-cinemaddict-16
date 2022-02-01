@@ -3,6 +3,7 @@ import he from 'he';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import {SHAKE_ANIMATION_TIMEOUT} from './abstract-view';
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -191,28 +192,37 @@ export default class PopupView extends SmartView {
     this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchListClickHandler);
   };
 
+  shakeComments = (callback) => {
+    const comments = this.element.querySelector('.film-details__comments-list');
+    comments.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    setTimeout(() => {
+      comments.style.animation = '';
+      callback();
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
   setDeleteCommentButtonClickHandler = (callback) => {
     this._callback.deleteCommentClick = callback;
     const buttons = this.element.querySelectorAll('.film-details__comment-delete');
     if (buttons) {
       buttons.forEach((button) => {
-        button.addEventListener('click', this.#deleteCommentClick);
+        button.addEventListener('click', this.#deleteCommentClickHandler);
       });
     }
   };
 
   setSubmitFormClickHandler = (callback) => {
     this._callback.submitComment = callback;
-    document.addEventListener('keydown', this.#submitFormKeyDown);
+    document.addEventListener('keydown', this.#submitFormKeyDownHandler);
   };
 
-  #submitFormKeyDown = (evt) => {
+  #submitFormKeyDownHandler = (evt) => {
     if ((evt.ctrlKey || evt.metaKey) && evt.key === 'Enter') {
       const commentInput = this.element.querySelector('.film-details__comment-input').value;
-      const emoji = this.element.querySelector('.comment-emoji').alt;
-      if (!commentInput || !emoji) {
+      if (commentInput === null || !this._data.emoji) {
         return;
       }
+      const emoji = this.element.querySelector('.comment-emoji').alt;
       const newComment = {
         comment: he.encode(commentInput),
         emotion: emoji,
@@ -222,7 +232,7 @@ export default class PopupView extends SmartView {
     }
   };
 
-  #deleteCommentClick = (evt) => {
+  #deleteCommentClickHandler = (evt) => {
     if (evt.target.tagName !== 'BUTTON') {
       return;
     }
@@ -250,12 +260,6 @@ export default class PopupView extends SmartView {
     this._callback.watched();
   };
 
-  static parseMovieToData = (movie) => ({
-    ...movie,
-    isDisabled: false,
-    isSaving: false,
-  });
-
   #closeButtonClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.closeButton();
@@ -264,6 +268,12 @@ export default class PopupView extends SmartView {
   #emojiHandler = (evt) => {
     this.updateData({...this._data, emoji: evt.target.alt});
   };
+
+  static parseMovieToData = (movie) => ({
+    ...movie,
+    isDisabled: false,
+    isSaving: false,
+  });
 }
 
 
