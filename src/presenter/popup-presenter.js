@@ -16,6 +16,7 @@ export default class PopupPresenter {
   #changeMode = null;
   #comments;
   #deletingComment;
+  #action;
 
   constructor(changeData, changeMode) {
     this.#changeData = changeData;
@@ -48,6 +49,7 @@ export default class PopupPresenter {
   };
 
   #handleDeleteCommentClick = (commentId) => {
+    this.#action = UserAction.REMOVE_COMMENT;
     this.#deletingComment = commentId;
     this.#changeData(
       UserAction.REMOVE_COMMENT,
@@ -90,7 +92,7 @@ export default class PopupPresenter {
       {...this.#film, isWatched: !this.#film.isWatched});
   };
 
-  setViewState = (state, userAction) => {
+  setViewState = (state) => {
     switch (state) {
       case State.DELETING:
         this.#setStateCommentDelete(this.#deletingComment);
@@ -102,7 +104,7 @@ export default class PopupPresenter {
         this.#popup.updateData({isDisabled: true});
         break;
       case State.ABORTING:
-        if(userAction === UserAction.REMOVE_COMMENT){
+        if(this.#action === UserAction.REMOVE_COMMENT){
           this.#popup.shakeComments(this.#resetStateView);
           return;
         }
@@ -126,6 +128,7 @@ export default class PopupPresenter {
   };
 
   #handleSubmitComment = (newComment) => {
+    this.#action = UserAction.ADD_COMMENT;
     this.#changeData(
       UserAction.ADD_COMMENT,
       UpdateType.PATCH,

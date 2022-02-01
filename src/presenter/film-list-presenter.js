@@ -88,7 +88,7 @@ export default class FilmListPresenter {
         try {
           await this.#moviesModel.removeComment(updateType, update, localComment);
         } catch (err) {
-          this.#filmPresenter.get(update.id).setViewState(State.ABORTING, UserAction.REMOVE_COMMENT);
+          this.#filmPresenter.get(update.id).setViewState(State.ABORTING);
         }
         break;
     }
