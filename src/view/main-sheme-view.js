@@ -9,7 +9,7 @@ const createMainSheme = () => (
  </section>`
 );
 
-export default class MainSheme extends AbstractView{
+export default class MainShemeView extends AbstractView{
   get template() {
     return createMainSheme();
   }

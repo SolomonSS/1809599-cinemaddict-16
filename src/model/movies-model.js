@@ -54,6 +54,7 @@ export default class MoviesModel extends AbstractObservable {
     try{
       this.#apiService.deleteComment(comment).then(()=>{
         this.#comments = [...this.#comments.slice(0, index), ...this.#comments.slice(index+1)];
+        update.comments = [...update.comments.slice(0, index), ...update.comments.slice(index+1)];
         this._notify(updateType, update);
       });
     }
@@ -87,6 +88,24 @@ export default class MoviesModel extends AbstractObservable {
     watchingTime: movie.user_details.watching_date ? movie.user_details.watching_date : '',
   });
 
+  updateMovie = async (updateType, update) => {
+    const index = this.#movies.findIndex((movie) => movie.id === update.id);
+
+    if (index === -1) {
+      throw new Error('Can\'t update unexisting movie');
+    }
+    await this.#apiService.updateMovie(MoviesModel.adaptToServer(update)).then((movie) => {
+      const updatedMovie = this.#adaptToClient(movie);
+      this.#movies = [
+        ...this.#movies.slice(0, index),
+        updatedMovie,
+        ...this.#movies.slice(index + 1),
+      ];
+
+      this._notify(updateType, updatedMovie);
+    });
+  };
+
   static adaptToServer = (movie) => ({
     id: movie.id,
     comments: movie.comments,
@@ -114,22 +133,4 @@ export default class MoviesModel extends AbstractObservable {
       watching_date: movie.watchingTime,
     }
   });
-
-  updateMovie = async (updateType, update) => {
-    const index = this.#movies.findIndex((movie) => movie.id === update.id);
-
-    if (index === -1) {
-      throw new Error('Can\'t update unexisting movie');
-    }
-    await this.#apiService.updateMovie(MoviesModel.adaptToServer(update)).then((movie) => {
-      const updatedMovie = this.#adaptToClient(movie);
-      this.#movies = [
-        ...this.#movies.slice(0, index),
-        updatedMovie,
-        ...this.#movies.slice(index + 1),
-      ];
-
-      this._notify(updateType, updatedMovie);
-    });
-  };
 }

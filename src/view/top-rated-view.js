@@ -15,12 +15,17 @@ const createTopRatedTemplate = () => (
  </section>`);
 
 export default class TopRatedTemplateView extends AbstractView {
+  #moviesModel
   #topRated;
   #mostCommented;
+  #changeData;
+  #changeMode;
 
-  constructor(data) {
+  constructor(data, changeData, changeMode) {
     super();
-    this._data = data;
+    this.#moviesModel = [...data];
+    this.#changeData = changeData;
+    this.#changeMode = changeMode;
     this.getTopRated();
     this.getMostCommented();
   }
@@ -31,17 +36,17 @@ export default class TopRatedTemplateView extends AbstractView {
 
   getTopRated = () => {
     this.#topRated = this.element.querySelector('#top-rated-movies');
-    this._data.sort(sortByRating);
+    this.this.#moviesModel.sort(sortByRating);
     for (let i = 0; i < 2; i++) {
-      new FilmPresenter(this.#topRated).init(this._data[i]);
+      new FilmPresenter(this.#topRated, this.#changeData, this.#changeMode).init(this.#moviesModel[i]);
     }
   };
 
   getMostCommented = () =>{
     this.#mostCommented = this.element.querySelector('#most-commented-movies');
-    this._data.sort((movieA, movieB) => movieB.comments.length - movieA.comments.length);
+    this.this.#moviesModel.sort((movieA, movieB) => movieB.comments.length - movieA.comments.length);
     for (let i = 0; i < 2; i++) {
-      new FilmPresenter(this.#mostCommented).init(this._data[i]);
+      new FilmPresenter(this.#mostCommented, this.#changeData, this.#changeMode).init(this.#moviesModel[i]);
     }
   }
 }

@@ -62,7 +62,7 @@ export default class FilmPresenter {
     this.#mode = Mode.DEFAULT;
   };
 
-  setViewState = (state) => {
+  setViewState = (state, userAction) => {
     if (this.#mode === Mode.DEFAULT) {
       if (state === State.UPDATING) {
         this.#filmCard.updateData({isDisabled: true});
@@ -73,7 +73,7 @@ export default class FilmPresenter {
         return;
       }
     }
-    this.#popupPresenter.setViewState(state);
+    this.#popupPresenter.setViewState(state, userAction);
   };
 
   resetViewState = () => {
