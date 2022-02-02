@@ -35,7 +35,7 @@ export default class FilmPresenter {
     this.#filmCard.setIsWatchedClickHandler(this.#handleIsWatched);
     this.#filmCard.setIsAddedToWatchListClickHandler(this.#handleIsAddedToWatchList);
 
-    if (prevFilmComponent === null) {
+    if (!prevFilmComponent) {
       render(this.#filmsContainer, this.#filmCard.element, RenderPosition.BEFOREEND);
       return;
     } else {

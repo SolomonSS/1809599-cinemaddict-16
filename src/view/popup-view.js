@@ -219,7 +219,7 @@ export default class PopupView extends SmartView {
   #submitFormKeyDownHandler = (evt) => {
     if ((evt.ctrlKey || evt.metaKey) && evt.key === 'Enter') {
       const commentInput = this.element.querySelector('.film-details__comment-input').value;
-      if (commentInput === null || !this._data.emoji) {
+      if (commentInput.length === 0 || !this._data.emoji) {
         return;
       }
       const emoji = this.element.querySelector('.comment-emoji').alt;

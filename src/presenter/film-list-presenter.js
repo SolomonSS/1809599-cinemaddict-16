@@ -24,7 +24,7 @@ export default class FilmListPresenter {
   #showMoreButton = new ShowMoreButtonView();
   #sortList;
   #userRank;
-  #mainSheme = new MainShemeView();
+  #mainSheme;
   #loadingComponent = new LoadingView();
   #renderedFilmsCount = FILM_COUNT_PER_CLICK;
   #mainContainer;
@@ -47,7 +47,7 @@ export default class FilmListPresenter {
   get movies() {
     this.#filterType = this.#filterModel.filter;
     const movies = this.#moviesModel.movies;
-    const filteredMovies = filter[this.#filterType](movies);
+    const filteredMovies = filter[this.#filterType](movies.slice());
 
     switch (this._currentSortType) {
       case SortType.DATE:
@@ -60,7 +60,6 @@ export default class FilmListPresenter {
 
   init = () => {
     this.#renderPageElements();
-    this.#filmsListContainer = document.querySelector('.films-list__container');
     this.#renderFilmCards();
     this.#moviesModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -69,15 +68,7 @@ export default class FilmListPresenter {
   #handleViewAction = async (userAction, updateType, update, localComment) => {
     switch (userAction) {
       case UserAction.UPDATE:
-        if(this.#filmPresenter.has(update.id)){
-          this.#filmPresenter.get(update.id).setViewState(State.UPDATING);
-        }
-        if(this.#topRatedPresenters.has(update.id)){
-          this.#topRatedPresenters.get(update.id).setViewState(State.UPDATING);
-        }
-        if(this.#mostCommentedPresenters.has(update.id)){
-          this.#mostCommentedPresenters.get(update.id).setViewState(State.UPDATING);
-        }
+        this.#handleSetView(update, State.UPDATING);
         try {
           await this.#moviesModel.updateMovie(updateType, update);
         } catch (err) {
@@ -108,8 +99,19 @@ export default class FilmListPresenter {
         }
         break;
     }
-
   };
+
+  #handleSetView = (update, state) =>{
+    if(this.#filmPresenter.has(update.id)){
+      this.#filmPresenter.get(update.id).setViewState(state);
+    }
+    if(this.#topRatedPresenters.has(update.id)){
+      this.#topRatedPresenters.get(update.id).setViewState(state);
+    }
+    if(this.#mostCommentedPresenters.has(update.id)){
+      this.#mostCommentedPresenters.get(update.id).setViewState(state);
+    }
+  }
 
   destroy() {
     this.#clearMoviesList({resetRenderedMoviesCount: true, resetSortType: true});
@@ -164,10 +166,15 @@ export default class FilmListPresenter {
   };
 
   #renderPageElements = () => {
+    this.#mainSheme = new MainShemeView();
     render(this.#mainContainer, this.#mainSheme.element, RenderPosition.BEFOREEND);
+    this.#filmsListContainer = document.querySelector('.films-list__container');
   };
 
   #renderFilmCards = () => {
+    if(this.#mainSheme === null){
+      this.#renderPageElements();
+    }
     if (this.#isLoading) {
       this.#renderLoading();
       return;
@@ -217,9 +224,11 @@ export default class FilmListPresenter {
     filmPresenter.init(card);
     if(type === FilmListType.ALL){
       this.#filmPresenter.set(card.id, filmPresenter);
+      return;
     }
     if(type === FilmListType.TOP){
       this.#topRatedPresenters.set(card.id, filmPresenter);
+      return;
     }
     if(type === FilmListType.MOST){
       this.#mostCommentedPresenters.set(card.id, filmPresenter);
@@ -274,9 +283,15 @@ export default class FilmListPresenter {
   };
 
   #clearMoviesList = ({resetRenderedMoviesCount = false, resetSortType = false} = {}) => {
+    remove(this.#mainSheme);
+    this.#mainSheme = null;
     const moviesCount = this.movies.length;
     this.#filmPresenter.forEach((presenter) => presenter.destroy());
     this.#filmPresenter.clear();
+    this.#topRatedPresenters.forEach((presenter) => presenter.destroy());
+    this.#topRatedPresenters.clear();
+    this.#mostCommentedPresenters.forEach((presenter) => presenter.destroy());
+    this.#mostCommentedPresenters.clear();
     this.#buttonRemove();
     remove(this.#topRated);
     remove(this.#mostCommented);

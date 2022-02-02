@@ -38,8 +38,8 @@ export default class MoviesModel extends AbstractObservable {
     });
   };
 
-  postComment = (updateType, update, localComment) => {
-    this.#apiService.postComment(MoviesModel.adaptToServer(update), localComment).then((response) => {
+  postComment = async (updateType, update, localComment) => {
+    await this.#apiService.postComment(MoviesModel.adaptToServer(update), localComment).then((response)=>{
       const newMovie = this.#adaptToClient(response.movie);
       this.#comments = response.comments;
       this._notify(updateType, newMovie);
