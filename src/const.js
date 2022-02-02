@@ -35,3 +35,4 @@ export const UserAction = {
 
 export const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
 export const AUTHORIZATION = 'Basic jasndfas98';
+export const FILMS_COUNT_EXTRA_BLOCKS = 2;
