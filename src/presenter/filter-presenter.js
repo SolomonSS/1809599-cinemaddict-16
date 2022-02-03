@@ -1,6 +1,6 @@
-import FilterView from '../view/filters-view.js';
+import FiltersView from '../view/filters-view.js';
 import {remove, render, RenderPosition, replace} from '../utils/render.js';
-import {filter, FilterTypes, UpdateType} from '../const.js';
+import {filter, FilterType, UpdateType} from '../const.js';
 
 export default class FilterPresenter {
   #filterComponent = null;
@@ -20,24 +20,24 @@ export default class FilterPresenter {
 
     return [
       {
-        type: FilterTypes.ALL,
+        type: FilterType.ALL,
         name: 'All movies',
-        count: filter[FilterTypes.ALL](movies).length,
+        count: filter[FilterType.ALL](movies).length,
       },
       {
-        type: FilterTypes.WATCHLIST,
+        type: FilterType.WATCHLIST,
         name: 'Watchlist',
-        count: filter[FilterTypes.WATCHLIST](movies).length,
+        count: filter[FilterType.WATCHLIST](movies).length,
       },
       {
-        type: FilterTypes.HISTORY,
+        type: FilterType.HISTORY,
         name: 'History',
-        count: filter[FilterTypes.HISTORY](movies).length,
+        count: filter[FilterType.HISTORY](movies).length,
       },
       {
-        type: FilterTypes.FAVORITES,
+        type: FilterType.FAVORITES,
         name: 'Favorites',
-        count: filter[FilterTypes.FAVORITES](movies).length,
+        count: filter[FilterType.FAVORITES](movies).length,
       },
     ];
   }
@@ -45,7 +45,7 @@ export default class FilterPresenter {
   init = () => {
     const filters = this.filters;
     const prevFilterComponent = this.#filterComponent;
-    this.#filterComponent = new FilterView(filters, this.#filterModel.filter);
+    this.#filterComponent = new FiltersView(filters, this.#filterModel.filter);
     this.#filterComponent.setFilterTypeChangeHandler(this.#handleFilterTypeChange);
     this.#filterComponent.setStatisticsClickHandler(this.#menuClickCallback);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -65,7 +65,7 @@ export default class FilterPresenter {
 
     this.#movieModel.removeObserver(this.#handleModelEvent);
     this.#filterModel.removeObserver(this.#handleModelEvent);
-    this.#filterModel.setFilter(UpdateType.MAJOR, FilterTypes.ALL);
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.ALL);
   };
 
   #handleModelEvent = () => {

@@ -7,7 +7,7 @@ export const UpdateType = {
   INIT: 'INIT',
 };
 
-export const FilterTypes = {
+export const FilterType = {
   ALL: 'ALL',
   FAVORITES: 'FAVORITES',
   WATCHLIST: 'WATCHLIST',
@@ -15,10 +15,10 @@ export const FilterTypes = {
 };
 
 export const filter = {
-  [FilterTypes.ALL]: (movies) => movies,
-  [FilterTypes.FAVORITES]: (movies) => movies.filter((movie) => movie.isAddedToFavorite),
-  [FilterTypes.WATCHLIST]: (movies) => movies.filter((movie) => movie.isAddedToWatchList),
-  [FilterTypes.HISTORY]: (movies) => movies.filter((movie) => movie.isWatched),
+  [FilterType.ALL]: (movies) => movies,
+  [FilterType.FAVORITES]: (movies) => movies.filter((movie) => movie.isAddedToFavorite),
+  [FilterType.WATCHLIST]: (movies) => movies.filter((movie) => movie.isAddedToWatchList),
+  [FilterType.HISTORY]: (movies) => movies.filter((movie) => movie.isWatched),
 };
 
 export const MenuItem = {

@@ -1,10 +1,10 @@
-import TopRatedTemplateView from '../view/top-rated-view.js';
+import TopRatedView from '../view/top-rated-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
 import SortView, {SortType} from '../view/sort-view.js';
 import MainShemeView from '../view/main-sheme-view.js';
 import {remove, render, RenderPosition, sortByDate, sortByRating} from '../utils/render.js';
 import FilmPresenter from './film-presenter.js';
-import {FILM_COUNT_PER_CLICK, FILMS_COUNT_EXTRA_BLOCKS, filter, FilterTypes, UpdateType, UserAction} from '../const.js';
+import {FILM_COUNT_PER_CLICK, FILMS_COUNT_EXTRA_BLOCKS, filter, FilterType, UpdateType, UserAction} from '../const.js';
 import EmptyView from '../view/empty-view.js';
 import LoadingView from '../view/loading-view.js';
 import {State} from './popup-presenter.js';
@@ -32,7 +32,7 @@ export default class FilmListPresenter {
   #filmsListContainer;
   _currentSortType = SortType.DEFAULT;
   #filterModel = null;
-  #filterType = FilterTypes.ALL;
+  #filterType = FilterType.ALL;
   #noMoviesComponent = null;
   #isLoading = true;
   #topRatedPresenters = new Map();
@@ -238,7 +238,7 @@ export default class FilmListPresenter {
   #renderTopRated = () => {
     const movies = this.movies.sort(sortByRating).slice(0, FILMS_COUNT_EXTRA_BLOCKS);
     if (movies[0].rating > 0) {
-      this.#topRated = new TopRatedTemplateView();
+      this.#topRated = new TopRatedView();
       render(this.#mainContainer.querySelector('section.films'), this.#topRated.element, RenderPosition.BEFOREEND);
       const container = this.#topRated.element.querySelector('#top-rated-movies');
       movies.forEach((movie) => {
