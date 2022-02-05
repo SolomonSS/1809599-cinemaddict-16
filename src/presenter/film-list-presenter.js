@@ -22,7 +22,7 @@ export default class FilmListPresenter {
   #topRated = null;
   #mostCommented;
   #showMoreButton = new ShowMoreButtonView();
-  #sortList;
+  #sortList = null;
   #userRank;
   #mainSheme;
   #loadingComponent = new LoadingView();
@@ -139,9 +139,11 @@ export default class FilmListPresenter {
       case UpdateType.PATCH:
         if (this.#filmPresenter.has(data.id) && this.#filmPresenter.get(data.id).mode === Mode.POPUP) {
           this.#filmPresenter.get(data.id).init(data, this.#moviesModel.comments);
+          return;
         }
         if (this.#topRatedPresenters.has(data.id) && this.#topRatedPresenters.get(data.id).mode === Mode.POPUP) {
           this.#topRatedPresenters.get(data.id).init(data, this.#moviesModel.comments);
+          return;
         }
         if (this.#mostCommentedPresenters.has(data.id) && this.#mostCommentedPresenters.get(data.id).mode === Mode.POPUP) {
           this.#mostCommentedPresenters.get(data.id).init(data, this.#moviesModel.comments);
@@ -185,7 +187,7 @@ export default class FilmListPresenter {
     }
     this.#renderUserRank();
     const moviesCount = this.movies.length;
-    if (moviesCount === 0) {
+    if (moviesCount === 0 && this.#sortList !== null) {
       remove(this.#sortList);
     }
     if (moviesCount > 0 && this.#sortList !== null) {

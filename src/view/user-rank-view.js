@@ -3,7 +3,7 @@ import {getUserRank, getWatched} from './statistic/statistic-view';
 
 const createUserRankTemplate = (data) => (
   `<section class="header__profile profile">
-    <p class="profile__rating">${getUserRank(getWatched(data))}</p>
+    <p class="profile__rating">${data.length!== 0 ? getUserRank(getWatched(data)) : ''}</p>
     <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
   </section>`
 );

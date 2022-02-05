@@ -98,17 +98,10 @@ export default class FilmPresenter {
   };
 
   #handleIsWatched = () => {
-    if (this.#film.isWatched) {
-      this.#changeData(
-        UserAction.UPDATE,
-        UpdateType.MINOR,
-        {...this.#film, isWatched: !this.#film.isWatched, watchingTime: null});
-    } else {
-      this.#changeData(
-        UserAction.UPDATE,
-        UpdateType.MINOR,
-        {...this.#film, isWatched: !this.#film.isWatched, watchingTime: `${dayjs().format()}`});
-    }
+    this.#changeData(
+      UserAction.UPDATE,
+      UpdateType.MINOR,
+      {...this.#film, isWatched: !this.#film.isWatched, watchingTime: `${dayjs().format()}`});
   };
 
   #handleIsAddedToWatchList = () => {

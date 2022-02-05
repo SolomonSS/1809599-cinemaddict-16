@@ -64,7 +64,7 @@ export default class PopupPresenter {
   };
 
   #removePopup = () => {
-    if(this.#popup!==null){
+    if (this.#popup !== null) {
       if (document.body.contains(this.#popup.element)) {
         document.body.removeChild(this.#popup.element);
         this.#popup = null;
@@ -82,17 +82,10 @@ export default class PopupPresenter {
   };
 
   #handleIsWatched = () => {
-    if (this.#film.isWatched) {
-      this.#changeData(
-        UserAction.UPDATE,
-        UpdateType.MINOR,
-        {...this.#film, isWatched: !this.#film.isWatched, watchingTime: null});
-    } else {
-      this.#changeData(
-        UserAction.UPDATE,
-        UpdateType.MINOR,
-        {...this.#film, isWatched: !this.#film.isWatched, watchingTime: `${dayjs().format()}`});
-    }
+    this.#changeData(
+      UserAction.UPDATE,
+      UpdateType.PATCH,
+      {...this.#film, isWatched: !this.#film.isWatched, watchingTime: `${dayjs().format()}`});
   };
 
   setViewState = (state) => {
@@ -107,7 +100,7 @@ export default class PopupPresenter {
         this.#popup.updateData({isDisabled: true});
         break;
       case State.ABORTING:
-        if(this.#action === UserAction.REMOVE_COMMENT){
+        if (this.#action === UserAction.REMOVE_COMMENT) {
           this.#popup.shakeComments(this.#resetStateView);
           return;
         }
@@ -116,7 +109,7 @@ export default class PopupPresenter {
     }
   };
 
-  #resetStateView = () =>{
+  #resetStateView = () => {
     this.#popup.updateData({
       isDisabled: false,
       idCommentDelete: null,
@@ -124,7 +117,7 @@ export default class PopupPresenter {
     });
     this.#deletingComment = null;
     this.#action = null;
-  }
+  };
 
   #handleIsAddedToWatchList = () => {
     this.#changeData(UserAction.UPDATE,

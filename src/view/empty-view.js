@@ -1,7 +1,7 @@
 import AbstractView from './abstract-view.js';
 import {FilterType} from '../const';
 
-const NoMoviesTextExamples = {
+const NoMoviesTextExample = {
   [FilterType.ALL]: 'There are no movies in our database',
   [FilterType.FAVORITES]: 'There are no favorite movies now',
   [FilterType.WATCHLIST]: 'There are no movies to watch now',
@@ -9,7 +9,7 @@ const NoMoviesTextExamples = {
 };
 
 const createEmptyTemplate = (filterType) => {
-  const noMoviesText = NoMoviesTextExamples[filterType];
+  const noMoviesText = NoMoviesTextExample[filterType];
   return (`<h2 class="films-list__title">${noMoviesText}</h2>`);
 };
 

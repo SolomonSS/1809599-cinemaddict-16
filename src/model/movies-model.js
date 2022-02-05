@@ -88,7 +88,7 @@ export default class MoviesModel extends AbstractObservable {
     isAddedToWatchList: movie.user_details.watchlist,
     isWatched: movie.user_details.already_watched,
     isAddedToFavorite: movie.user_details.favorite,
-    watchingTime: movie.user_details.watching_date ? movie.user_details.watching_date : '',
+    watchingTime: movie.user_details.watching_date ? movie.user_details.watching_date : null,
   });
 
   updateMovie = async (updateType, update) => {
