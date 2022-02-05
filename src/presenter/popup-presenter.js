@@ -1,6 +1,7 @@
 import PopupView from '../view/popup-view.js';
 import {remove, replace} from '../utils/render.js';
 import {UpdateType, UserAction} from '../const.js';
+import dayjs from 'dayjs';
 
 export const State = {
   SAVING: 'SAVING',
@@ -58,24 +59,19 @@ export default class PopupPresenter {
       commentId);
   };
 
-  #setStateCommentDelete = (commentId) => {
-    this.#popup.updateData({
-      idCommentDelete: commentId,
-    });
-
-  }
-
   #handleClosePopupClick = () => {
     this.#removePopup();
   };
 
   #removePopup = () => {
-    if (document.body.contains(this.#popup.element)) {
-      document.body.removeChild(this.#popup.element);
-      this.#popup = null;
+    if(this.#popup!==null){
+      if (document.body.contains(this.#popup.element)) {
+        document.body.removeChild(this.#popup.element);
+        this.#popup = null;
+      }
+      this.#changeMode();
+      document.removeEventListener('keydown', this.#escKeyDownHandler);
     }
-    this.#changeMode();
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
   #handleIsAddedToFavorite = () => {
@@ -86,16 +82,23 @@ export default class PopupPresenter {
   };
 
   #handleIsWatched = () => {
-    this.#changeData(
-      UserAction.UPDATE,
-      UpdateType.PATCH,
-      {...this.#film, isWatched: !this.#film.isWatched});
+    if (this.#film.isWatched) {
+      this.#changeData(
+        UserAction.UPDATE,
+        UpdateType.MINOR,
+        {...this.#film, isWatched: !this.#film.isWatched, watchingTime: null});
+    } else {
+      this.#changeData(
+        UserAction.UPDATE,
+        UpdateType.MINOR,
+        {...this.#film, isWatched: !this.#film.isWatched, watchingTime: `${dayjs().format()}`});
+    }
   };
 
   setViewState = (state) => {
     switch (state) {
       case State.DELETING:
-        this.#setStateCommentDelete(this.#deletingComment);
+        this.#popup.updateData({idCommentDelete: this.#deletingComment});
         break;
       case State.SAVING:
         this.#popup.updateData({isSaving: true});
@@ -119,6 +122,8 @@ export default class PopupPresenter {
       idCommentDelete: null,
       isSaving: false,
     });
+    this.#deletingComment = null;
+    this.#action = null;
   }
 
   #handleIsAddedToWatchList = () => {

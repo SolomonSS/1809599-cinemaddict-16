@@ -30,7 +30,7 @@ const renderComments = (popup, comments) => {
               <p class="film-details__comment-info">
                 <span class="film-details__comment-author">${comment.author ? comment.author : ''}</span>
                 <span class="film-details__comment-day">${comment.date ? dayjs(comment.date).fromNow() : ''}</span>
-                <button id="${comment.id}" ${popup.idCommentDelete === comment.id ? 'disabled': ''} class="film-details__comment-delete">${popup.idCommentDelete === comment.id ? 'Deleting':'Delete' }</button>
+                <button id="${comment.id}" ${popup.idCommentDelete === comment.id ? 'disabled' : ''} class="film-details__comment-delete">${popup.idCommentDelete === comment.id ? 'Deleting' : 'Delete'}</button>
               </p>
             </div>
           </li>`;
@@ -102,17 +102,17 @@ const popupTemplate = (popup, comments) =>
         </div>
 
       <section class="film-details__controls">
-        <button type="button" class="film-details__control-button film-details__control-button--watchlist ${popup.isAddedToWatchList ? 'film-details__control-button--active' : ''}" id="watchlist" ${popup.isDisabled ? 'disabled':''} name="watchlist">Add to watchlist</button>
-        <button type="button" class="film-details__control-button film-details__control-button--watched ${popup.isWatched ? 'film-details__control-button--active' : ''}" id="watched" name="watched" ${popup.isDisabled ? 'disabled':''}>Already watched</button>
-        <button type="button" class="film-details__control-button film-details__control-button--favorite ${popup.isAddedToFavorite ? 'film-details__control-button--active' : ''}" id="favorite" name="favorite" ${popup.isDisabled ? 'disabled':''}>Add to favorites</button>
+        <button type="button" class="film-details__control-button film-details__control-button--watchlist ${popup.isAddedToWatchList ? 'film-details__control-button--active' : ''}" id="watchlist" ${popup.isDisabled ? 'disabled' : ''} name="watchlist">Add to watchlist</button>
+        <button type="button" class="film-details__control-button film-details__control-button--watched ${popup.isWatched ? 'film-details__control-button--active' : ''}" id="watched" name="watched" ${popup.isDisabled ? 'disabled' : ''}>Already watched</button>
+        <button type="button" class="film-details__control-button film-details__control-button--favorite ${popup.isAddedToFavorite ? 'film-details__control-button--active' : ''}" id="favorite" name="favorite" ${popup.isDisabled ? 'disabled' : ''}>Add to favorites</button>
       </section>
     </div>
 
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
+        <h3 class="film-details__comments-title">${popup.comments.length === 1 ? 'Comment' : 'Comments'}<span class="film-details__comments-count">${popup.comments.length}</span></h3>
 
-        <ul class="film-details__comments-list"> ${comments ? renderComments(popup, comments) : ''}
+        <ul class="film-details__comments-list"> ${comments.length === popup.comments.length ? renderComments(popup, comments) : 'Sorry, can\'t get comments from database'}
         </ul>
 
         <div class="film-details__new-comment">
@@ -121,7 +121,7 @@ const popupTemplate = (popup, comments) =>
           </div>
 
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${popup.isSaving ? 'disabled':''}></textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${popup.isSaving ? 'disabled' : ''}></textarea>
           </label>
 
           <div class="film-details__emoji-list">
@@ -175,6 +175,7 @@ export default class PopupView extends SmartView {
     this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#watchedClickHandler);
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteClickHandler);
     this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchListClickHandler);
+    this.setDeleteCommentButtonClickHandler(this._callback.deleteCommentClick);
   };
 
   setWatchedClickHandler = (callback) => {
@@ -193,13 +194,13 @@ export default class PopupView extends SmartView {
   };
 
   shakeComments = (callback) => {
-    const comments = this.element.querySelector('.film-details__comments-list');
-    comments.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    const comments = this.element.querySelector('.film-details__comments-wrap');
+    comments.classList.add('shake');
     setTimeout(() => {
-      comments.style.animation = '';
+      comments.classList.remove('shake');
       callback();
     }, SHAKE_ANIMATION_TIMEOUT);
-  }
+  };
 
   setDeleteCommentButtonClickHandler = (callback) => {
     this._callback.deleteCommentClick = callback;
@@ -233,10 +234,10 @@ export default class PopupView extends SmartView {
   };
 
   #deleteCommentClickHandler = (evt) => {
+    evt.preventDefault();
     if (evt.target.tagName !== 'BUTTON') {
       return;
     }
-    evt.preventDefault();
     this._callback.deleteCommentClick(evt.target.id);
   };
 
@@ -266,6 +267,7 @@ export default class PopupView extends SmartView {
   };
 
   #emojiHandler = (evt) => {
+    evt.preventDefault();
     this.updateData({...this._data, emoji: evt.target.alt});
   };
 

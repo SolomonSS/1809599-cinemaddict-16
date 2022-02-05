@@ -2,6 +2,7 @@ import FilmCardView from '../view/film-card-view.js';
 import {remove, render, RenderPosition, replace} from '../utils/render.js';
 import {UpdateType, UserAction} from '../const.js';
 import PopupPresenter, {State} from './popup-presenter';
+import dayjs from 'dayjs';
 
 export const Mode = {
   DEFAULT: 'DEFAULT',
@@ -46,6 +47,10 @@ export default class FilmPresenter {
     }
     remove(prevFilmComponent);
   };
+
+  get mode() {
+    return this.#mode;
+  }
 
   resetView = () => {
     if (this.#mode !== Mode.DEFAULT) {
@@ -93,10 +98,17 @@ export default class FilmPresenter {
   };
 
   #handleIsWatched = () => {
-    this.#changeData(
-      UserAction.UPDATE,
-      UpdateType.MINOR,
-      {...this.#film, isWatched: !this.#film.isWatched});
+    if (this.#film.isWatched) {
+      this.#changeData(
+        UserAction.UPDATE,
+        UpdateType.MINOR,
+        {...this.#film, isWatched: !this.#film.isWatched, watchingTime: null});
+    } else {
+      this.#changeData(
+        UserAction.UPDATE,
+        UpdateType.MINOR,
+        {...this.#film, isWatched: !this.#film.isWatched, watchingTime: `${dayjs().format()}`});
+    }
   };
 
   #handleIsAddedToWatchList = () => {

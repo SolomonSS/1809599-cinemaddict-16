@@ -31,15 +31,19 @@ export default class MoviesModel extends AbstractObservable {
     return this.#comments;
   }
 
-  getComments = (updateType, movie) => {
-    this.#apiService.getComments(MoviesModel.adaptToServer(movie)).then((data) => {
-      this.#comments = data;
-      this._notify(updateType, movie);
-    });
+  getComments = async (updateType, movie) => {
+    try {
+      await this.#apiService.getComments(MoviesModel.adaptToServer(movie)).then((data) => {
+        this.#comments = data;
+      });
+    } catch (err) {
+      this.#comments = [];
+    }
+    this._notify(updateType, movie);
   };
 
   postComment = async (updateType, update, localComment) => {
-    await this.#apiService.postComment(MoviesModel.adaptToServer(update), localComment).then((response)=>{
+    await this.#apiService.postComment(MoviesModel.adaptToServer(update), localComment).then((response) => {
       const newMovie = this.#adaptToClient(response.movie);
       this.#comments = response.comments;
       this._notify(updateType, newMovie);
@@ -129,7 +133,7 @@ export default class MoviesModel extends AbstractObservable {
       watchlist: movie.isAddedToWatchList,
       favorite: movie.isAddedToFavorite,
       already_watched: movie.isWatched,
-      watching_date: movie.watchingTime,
+      watching_date: movie.isWatched ? movie.watchingTime : null,
     }
   });
 }
