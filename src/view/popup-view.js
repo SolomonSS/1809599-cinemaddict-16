@@ -30,7 +30,7 @@ const renderComments = (popup, comments) => {
               <p class="film-details__comment-info">
                 <span class="film-details__comment-author">${comment.author ? comment.author : ''}</span>
                 <span class="film-details__comment-day">${comment.date ? dayjs(comment.date).fromNow() : ''}</span>
-                <button id="${comment.id}" ${popup.idCommentDelete === comment.id ? 'disabled' : ''} class="film-details__comment-delete">${popup.idCommentDelete === comment.id ? 'Deleting' : 'Delete'}</button>
+                <button id="${comment.id}" ${popup.idCommentDelete === comment.id ? 'disabled' : ''} class="film-details__comment-delete">${popup.idCommentDelete === comment.id ? 'Deleting...' : 'Delete'}</button>
               </p>
             </div>
           </li>`;
