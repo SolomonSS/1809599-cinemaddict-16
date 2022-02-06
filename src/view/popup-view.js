@@ -110,7 +110,7 @@ const popupTemplate = (popup, comments) =>
 
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">${popup.comments.length === 1 ? 'Comment' : 'Comments'}<span class="film-details__comments-count">${popup.comments.length}</span></h3>
+        <h3 class="film-details__comments-title">${popup.comments.length === 1 ? 'Comment ' : 'Comments '}<span class="film-details__comments-count">${popup.comments.length}</span></h3>
 
         <ul class="film-details__comments-list"> ${comments.length === popup.comments.length ? renderComments(popup, comments) : 'Sorry, can\'t get comments from database'}
         </ul>
